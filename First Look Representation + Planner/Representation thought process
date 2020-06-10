@@ -1,0 +1,33 @@
+So where should the actions in the world be defined. In PDDL, actions are object agnostic.
+
+Actions should be methods in the Domain class
+
+Make use of python's type system instead of PDDL
+
+
+Ok so the key might be in how to make the planner actually iterate through and search different states
+
+Ok so Python has a dynamic typing system. So the types are calculated at runtime, and have to deal with type exceptions as they occur. Making new types isnt really feasbilbe because baked into the programming language not really what we want
+
+Ok so now start on the planner. Develop a set of valid actions for the current world.
+
+Mkay so also gonna be interesting when they like vary the number of parameters for an action
+
+Ok so right now just pretty dumb, gonna call its own functions and see if they work. If they do add to potential size of the tree. Then use some algo to specify which branches of the tree to go down first. Gonna need to abstract that away. Seems legit
+
+Maybe later plug in someone else's pddl parser and have it generate sketchy python code as a demo workflow for this system??
+
+https://www.geeksforgeeks.org/metaprogramming-metaclasses-python/
+
+Metaprogramming for the win
+http://dabeaz.com/py3meta/Py3Meta.pdf
+Ok so learned about class decorators. Could use them to check arguments before they were getting applied to a function, but not that helpful
+
+https://github.com/pucrs-automated-planning/pddl-parser 
+
+Ok plan of action: 
+Wrap the action methods in classes so that they include argument metadata. Group the objects in the world by their classes. Then for each new action method, iterate through all of the possible classes of those to generate planner's next actions.
+
+Ok so now I need to be able to either reset the state every time which is inefficient, or just check that the predicates are satisfied. 
+
+Ok I think I need to abstract the actions as subclasses of the domain. Have a validates predicates method, and type metadata for the arguments
