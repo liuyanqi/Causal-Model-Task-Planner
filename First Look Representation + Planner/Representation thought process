@@ -30,4 +30,10 @@ Wrap the action methods in classes so that they include argument metadata. Group
 
 Ok so now I need to be able to either reset the state every time which is inefficient, or just check that the predicates are satisfied. 
 
-Ok I think I need to abstract the actions as subclasses of the domain. Have a validates predicates method, and type metadata for the arguments
+Ok I think I need to abstract the actions as subclasses of the domain. Have a validates predicates method, and type metadata for the arguments.
+
+
+Want to abstract away object class and have it automatically add its name to the metadata. Also want to abstract out notion of Domain vs BlockTower. I also broke printstate w objects
+
+For more generality, allow blocks to stack on themselves.
+

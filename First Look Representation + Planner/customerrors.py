@@ -1,7 +1,6 @@
 class Error(Exception):
 	pass
 
-
 class WrongInputType(Error):
 	def __init__(self, foundtype, expected, message="Error: action received the wrong type!"):
 		self.type = foundtype
