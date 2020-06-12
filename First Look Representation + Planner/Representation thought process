@@ -37,3 +37,63 @@ Want to abstract away object class and have it automatically add its name to the
 
 For more generality, allow blocks to stack on themselves.
 
+Want to get type grouping and iteration to work correctly
+
+Ok so I want to write a planner and include the basic causal model step. The stackable property is the property that we want to update with the causal model. Also should be a property between two blocks in the system
+
+How to generalize the search algorithm? Priority queue vs a normal queue in the search algorithm. 
+
+How do I represent state? Well it is I guess just a specific domain object. 
+
+
+Maybe fix object names vs objects, not sure I need to explicitly store their names, seems kindof hacky
+
+How do I calculate the freaking heuristics??? Like need to know the result by doing the action every time, exactly the problem March was talking about
+
+
+Todo:
+Ok so for now, the getValidActions function I feel like should be generic to a domain with defined actions, however it isn't there yet, so it should maybe stay in the planner, also buddy need some docstrings
+
+State is combination of action and variables?? Like can go back to same state but do different action?
+
+
+Good programming technique, explain it out loud and whiteboard it
+
+Interested to see how the planner in the library that March was talking about works because they would have had the same problem
+
+
+Ok so I can do whatever the fuck I want.
+So currently each node in the graph needs its own state representation. So instead of actions modifying a state in place, I want actions to be applied to a state, and change it
+
+So a domain is simply a state and all the available actions on that state. This is for a start state and any other intermediary state. 
+
+State is a list of object.
+
+Domain contains a list of actions, checks if a given state is the goal
+
+State is a collection of objects and other variables. Actions are applied to states, and return modified states
+
+So for list of actions, I don't also need a list of their names, if they themselves contain their names. Like for error messages can just do action.name
+
+So the reason why I stored all of the names is so I could do the eval trick, but that seems hacky, so I am going to try and fix it. 
+
+First need to verify, that can just do object.doAction
+
+Ok want to add get object by name from state functionality
+
+Hmmmm. Actions need to be able to edit a state. But how specify which object in state as parameter? I think actual object itself should go in parameter, not just the name. Maybe strings is the better way to go... Then have to change object representation again
+
+Ensure objects have names TODO
+
+Ok so now the planner can do actions without knowing their name, and by passing in a state object.
+
+Now need to iterate over all possible inputs to a given action and include metadata types to do the clever iteration I wanted to do, or maybe delay that for later -> MAYBE LATER
+
+Ok litty, so the next actions thing works fully now
+
+Fuck gonna need to generalize this to multiple numbers of parameters and types. Could generalize to taking in array rather than an actual set number of parameters, and each action does its own checking?
+
+Unhashable list type Grr
+
+
+

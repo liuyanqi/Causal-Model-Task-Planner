@@ -2,37 +2,67 @@ import inspect
 import world
 import customerrors
 import itertools
+from copy import deepcopy
+import random
 
 class Planner():
 	def __init__(self, domain):
 		self.domain = domain
-		self.getValidActions()
 
-		# self.domain.stack.doAction(self.domain.floor, self.domain.a)
-		# print("----------------------")
-		# self.getValidActions()
+	def plan(self):
+		def addNodes(state):
+			for action in self.domain.getValidActions(state):
+				next_nodes.append((action, deepcopy(state)))
 
-		self.domain.stack.doAction(self.domain.floor, self.domain.b)
-		print("----------------------")
-		self.getValidActions()
+		#Initialization
+		print("Initializing planner....")
+		#A node is an action and a state tuple
+		#(action, state)
 
-	def getValidActions(self):
-		#Generate all possible inputs
-		possible_inputs = list(itertools.combinations(self.domain.objects, 2))
-		for i in range(len(possible_inputs)):
-			possible_inputs.append(possible_inputs[i][::-1])
-		
-		for action in self.domain.actions:
-			print("NEW ACTION!")
-			print(action)
-			for i in possible_inputs:
-				b1 = "self.domain." + i[0]
-				b2 = "self.domain." + i[1]
-				funcstr = f'self.domain.{action}.checkPredicates({b1}, {b2})'
-				try:
-					eval(funcstr)
-				except customerrors.PredicateFailed as e:
-					# print(e)
-					continue
-				print("SUCCESS: " + funcstr)
+		seen = set()
+
+		#This stores all actions the BFS should go through
+		#Can use it as a queue, just append,then pop(0)
+		next_nodes = []
+		#Add all current possible actions to BFS
+		addNodes(self.domain.state)
+		print("Current nodes array: ")
+		print(next_nodes)
+
+		while not(self.domain.isGoalSatisfied()):
+			curr_node = next_nodes.pop(0)
+			print("Currently at node:")
+			print(curr_node)
+
+			if (curr_node in seen):
+				#We have already been at this state and done this action
+				#Exit to avoid an infinite loop
+				print("We have seen this node before, stopping")
+				continue
+
+			#Add the current node to the seen set
+			seen.add(curr_node)
+
+			#Unpack the node into action and parameters
+			curr_action_arr = curr_node[0]
+			curr_act_func = curr_action_arr[0]
+			curr_p1 = curr_action_arr[2]
+			curr_p2 = curr_action_arr[3]
+			curr_state = curr_node[1]
+
+			print("Action: ")
+			print(curr_act_func)
+			print("PRE State: ")
+			print(curr_state)
+
+			curr_action.doAction(curr_state, curr_p1, curr_p2)
+
+			print("POST State: ")
+			print(curr_state)
+
+			#Here is where I would have the causal step
+
+			#Now find all the next possible actions and add them to the actions list
+			addNodes(curr_state)
+
 
