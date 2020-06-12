@@ -111,14 +111,14 @@ class BlockTowerState(State):
 			ret += str(x)
 		return ret
 
+	def isGoalSatisfied(self):
+		return self.total_weight >= 4
+
 class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
 		self.stack = stack(self)
 		self.unstack = unstack(self)
-
-	def isGoalSatisfied(self):
-		return self.state.total_weight >= 4
 
 class Block():
 	def __init__(self, name, stackable, weight, stacked = False, top = False):

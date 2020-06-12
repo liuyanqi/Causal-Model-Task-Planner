@@ -96,4 +96,14 @@ Fuck gonna need to generalize this to multiple numbers of parameters and types. 
 Unhashable list type Grr
 
 
+Question about chaining actions
+Reinforcement learning??
 
+Cant use probabalistic PDDL because cannot update predicates from the visual perception at each action state
+
+Want to look into and see how the probablistic pddl model plans, thanks littman
+
+
+Ok so need to incorporate the causal model by generating a probability of taking a certain action given a state and a potential action
+
+Ok for right now, ignore the seen list

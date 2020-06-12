@@ -2,16 +2,12 @@ from abc import ABC, abstractmethod
 import itertools
 import customerrors
 
-class Domain(ABC):
+class Domain():
 	def __init__(self, state):
 		#Is a list of action classes that are possible
 		self.actions = []
 		#Stores a current state object
 		self.state = state
-
-	@abstractmethod
-	def isGoalSatisfied(self):
-		pass
 
 	def getValidActions(self, state):
 		actions = []
@@ -28,12 +24,11 @@ class Domain(ABC):
 				except customerrors.PredicateFailed as e:
 					continue
 				actions.append([action, action.name, b1, b2])
-		print(actions)
 		return actions
 
 
 # This superclass maintains a list of objects and their names in a domain state
-class State():
+class State(ABC):
 	def __init__(self):
 		self.obj_dict = {}
 		self.obj_names = []
@@ -46,6 +41,10 @@ class State():
 
 	def get(self, name):
 		return self.obj_dict[name]
+
+	@abstractmethod
+	def isGoalSatisfied(self):
+		pass
 
 #Abstract action class
 #This ensures that an action follows the correct function pattern

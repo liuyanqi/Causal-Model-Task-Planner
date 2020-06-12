@@ -19,8 +19,6 @@ class Planner():
 		#A node is an action and a state tuple
 		#(action, state)
 
-		seen = set()
-
 		#This stores all actions the BFS should go through
 		#Can use it as a queue, just append,then pop(0)
 		next_nodes = []
@@ -29,19 +27,20 @@ class Planner():
 		print("Current nodes array: ")
 		print(next_nodes)
 
-		while not(self.domain.isGoalSatisfied()):
-			curr_node = next_nodes.pop(0)
-			print("Currently at node:")
-			print(curr_node)
+		curr_node = next_nodes.pop(0)
 
-			if (curr_node in seen):
-				#We have already been at this state and done this action
-				#Exit to avoid an infinite loop
-				print("We have seen this node before, stopping")
-				continue
+		while not(curr_node[1].isGoalSatisfied()):
+			# print("Currently at node:")
+			# print(curr_node)
+			# print(type(curr_node))
 
-			#Add the current node to the seen set
-			seen.add(curr_node)
+			# if (curr_node in seen):
+			# 	#We have already been at this state and done this action
+			# 	#Exit to avoid an infinite loop
+			# 	print("We have seen this node before, stopping")
+			# 	continue
+			# #Add the current node to the seen set
+			# seen.add(curr_node)
 
 			#Unpack the node into action and parameters
 			curr_action_arr = curr_node[0]
@@ -50,19 +49,23 @@ class Planner():
 			curr_p2 = curr_action_arr[3]
 			curr_state = curr_node[1]
 
-			print("Action: ")
-			print(curr_act_func)
-			print("PRE State: ")
-			print(curr_state)
+			# print("Action: ")
+			# print(curr_act_func)
+			# print("PRE State: ")
+			# print(curr_state)
 
-			curr_action.doAction(curr_state, curr_p1, curr_p2)
+			print(curr_act_func.name + " " + curr_p1 + " " + curr_p2)
 
-			print("POST State: ")
-			print(curr_state)
+			curr_act_func.doAction(curr_state, curr_p1, curr_p2)
+
+			# print("POST State: ")
+			# print(curr_state)
 
 			#Here is where I would have the causal step
 
 			#Now find all the next possible actions and add them to the actions list
 			addNodes(curr_state)
+
+			curr_node = next_nodes.pop(0)
 
 
