@@ -23,7 +23,7 @@ class Domain():
 					action.checkPredicates(state, b1, b2)
 				except customerrors.PredicateFailed as e:
 					continue
-				actions.append([action, action.name, b1, b2])
+				actions.append(SpecificAction(action, [b1,b2], state))
 		return actions
 
 
@@ -66,3 +66,13 @@ class Action(ABC):
 	@abstractmethod
 	def checkTypes(self, state):
 		pass
+
+class SpecificAction():
+	def __init__(self, action, parameters, state):
+		self.action = action
+		self.parameters = parameters
+		self.state = state
+
+	def __str__(self):
+		return "Performed " + str(self.action.name) + " on " + str(self.parameters)
+

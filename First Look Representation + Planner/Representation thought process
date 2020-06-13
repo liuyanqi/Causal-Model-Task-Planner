@@ -107,3 +107,14 @@ Want to look into and see how the probablistic pddl model plans, thanks littman
 Ok so need to incorporate the causal model by generating a probability of taking a certain action given a state and a potential action
 
 Ok for right now, ignore the seen list
+
+I mean I guess just store the history of a node to each node we add to the nodes
+
+Generalize for action types and number of parameters
+
+Should also formalize the lists as actual classes and objects instead of just lists and shit. You know what? Why don't I just do that now
+
+Ok need to think through how to actually sample stuff and what happens if there is no otehr valid action 
+
+Ok so now I just need to incoporate the causal sampling step
+

@@ -1,6 +1,7 @@
 import customerrors as err
 from planner import *
 from abstracttypes import Action, Domain, State
+from causalmodel import CausalModel
 
 def getType(obj):
 		return type(obj).__name__
@@ -114,6 +115,7 @@ class BlockTowerState(State):
 	def isGoalSatisfied(self):
 		return self.total_weight >= 4
 
+
 class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
@@ -139,6 +141,9 @@ class Block():
 
 if __name__ == "__main__":
 	domain = BlockTower()
-	myPlan = Planner(domain)
-	myPlan.plan()
+	# myPlan = Planner(domain)
+	# myPlan.plan()
+	state = BlockTowerState()
+	actions = domain.getValidActions(state)
+	print(CausalModel.chooseNextAction(actions))
 

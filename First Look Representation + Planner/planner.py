@@ -4,15 +4,21 @@ import customerrors
 import itertools
 from copy import deepcopy
 import random
+import causalmodel
 
 class Planner():
+	class Node():
+		def __init__(self, specifiedaction, history):
+			self.specifiedaction = specifiedaction
+			self.history = history
+
 	def __init__(self, domain):
 		self.domain = domain
 
 	def plan(self):
-		def addNodes(state):
-			for action in self.domain.getValidActions(state):
-				next_nodes.append((action, deepcopy(state)))
+		def addNodes(state, history):
+			for specifiedaction in self.domain.getValidActions(state):
+				next_nodes.append(self.Node(deepcopy(specifiedaction), deepcopy(history)))
 
 		#Initialization
 		print("Initializing planner....")
@@ -23,49 +29,30 @@ class Planner():
 		#Can use it as a queue, just append,then pop(0)
 		next_nodes = []
 		#Add all current possible actions to BFS
-		addNodes(self.domain.state)
-		print("Current nodes array: ")
-		print(next_nodes)
+		addNodes(self.domain.state, [])
 
 		curr_node = next_nodes.pop(0)
 
-		while not(curr_node[1].isGoalSatisfied()):
-			# print("Currently at node:")
-			# print(curr_node)
-			# print(type(curr_node))
-
-			# if (curr_node in seen):
-			# 	#We have already been at this state and done this action
-			# 	#Exit to avoid an infinite loop
-			# 	print("We have seen this node before, stopping")
-			# 	continue
-			# #Add the current node to the seen set
-			# seen.add(curr_node)
-
+		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
 			#Unpack the node into action and parameters
-			curr_action_arr = curr_node[0]
-			curr_act_func = curr_action_arr[0]
-			curr_p1 = curr_action_arr[2]
-			curr_p2 = curr_action_arr[3]
-			curr_state = curr_node[1]
+			action = curr_node.specifiedaction
+			curr_history = curr_node.history
 
-			# print("Action: ")
-			# print(curr_act_func)
-			# print("PRE State: ")
-			# print(curr_state)
-
-			print(curr_act_func.name + " " + curr_p1 + " " + curr_p2)
-
-			curr_act_func.doAction(curr_state, curr_p1, curr_p2)
-
-			# print("POST State: ")
-			# print(curr_state)
+			action.action.doAction(action.state, action.parameters[0], action.parameters[1])
 
 			#Here is where I would have the causal step
 
 			#Now find all the next possible actions and add them to the actions list
-			addNodes(curr_state)
+			curr_history.append(action)
+			addNodes(action.state, curr_history)
 
 			curr_node = next_nodes.pop(0)
+
+		# print("Success")
+		# for step in curr_node.history:
+		# 	print(step)
+		return curr_node.history
+		
+
 
 
