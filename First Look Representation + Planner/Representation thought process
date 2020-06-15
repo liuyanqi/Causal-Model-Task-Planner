@@ -118,3 +118,21 @@ Ok need to think through how to actually sample stuff and what happens if there 
 
 Ok so now I just need to incoporate the causal sampling step
 
+Ok so maybe I want to write MonteCarloSearch.
+
+Current search algorithm is just BFS for every possible move.
+
+How incorporate probablistic information into the planner
+
+"First, the optimal action choices for reaching a goal may be a function of the probabilistic outcomes along the way—a single sequence of actions may not be sufficient. As a result, it can be difficult to output a “plan”. For this reason, we decided not to separate plan synthesis and execution into two phases, but instead evaluated planners online." -> Bingo, we are doing the same thing
+
+Probablistic PDDL allows changing of predicates probablistically. Key difference is that there is no way to integrate visual aspects to change predicates, 
+
+Why does the planner have to be online?
+Imagine instead of modelling the actions as probablistic, we model the uncertainty as being like another actor. Lets say we are playing soccer, impossible to write down a  plan for every possible move any player on the other team does we do this dependant on all other information. Plan would be IMMENSE, and also very computationally expensive to create.
+Rather we use the planner like a coach, shouting on the sidelines and adapting what each player should do to the current situation. 
+
+Was also thinking that the Monte Carlo Tree search might help Semir's problem of chaining actions. Might be easier to think about with a concrete chaining example
+
+Could set it up rn, such that if gets in impossible state, it recognizes it and tries again. I think this is what I will do for now
+

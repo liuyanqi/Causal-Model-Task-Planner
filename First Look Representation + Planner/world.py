@@ -141,9 +141,9 @@ class Block():
 
 if __name__ == "__main__":
 	domain = BlockTower()
-	# myPlan = Planner(domain)
-	# myPlan.plan()
-	state = BlockTowerState()
-	actions = domain.getValidActions(state)
-	print(CausalModel.chooseNextAction(actions))
+	myPlan = Planner(domain)
+	myPlan.planCausal()
+	# state = BlockTowerState()
+	# actions = domain.getValidActions(state)
+	# print(CausalModel.chooseNextAction(actions))
 

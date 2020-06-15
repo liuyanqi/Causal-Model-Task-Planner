@@ -74,5 +74,5 @@ class SpecificAction():
 		self.state = state
 
 	def __str__(self):
-		return "Performed " + str(self.action.name) + " on " + str(self.parameters)
+		return str(self.action.name) + " (" + str(self.parameters) + ")"
 
