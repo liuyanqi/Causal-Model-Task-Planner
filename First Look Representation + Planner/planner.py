@@ -52,52 +52,25 @@ class Planner():
 		return curr_node.history
 
 	@staticmethod
-	def strHistory(histarr):
-		ret = []
-		for h in histarr:
-			ret.append(str(h))
-
-		return ret
-
-	@staticmethod
 	def printHistory(histarr):
-		ret = []
-		for h in histarr:
-			print(str(h))
-
-		return ret
-
-	@staticmethod
-	def strHistoryMoves(histarr):
-		ret = []
 		for h in histarr:
 			if h.action != None:
 				print(str(h.action.name) + " " +str(h.parameters))
 
-		return ret
-
-
 	def planCausal(self):
-		
+		#This function checks if the current state is a "dead end state" and no more actions can be taken
+		#If that is the case, this function recursively backtracks until it finds a state that has valid actions
+		#Then it returns those valid actions
 		def checkBacktrack(curr_node):
-			#OK wait this should go back to previous state
-			#Something is messed up here
-
-			# print("In backtrack")
-			# print("Curr state:")
-			# print(curr_node.specifiedaction.state)
-			# print("Current history: ")
-			Planner.strHistory(curr_node.history)
 			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
-			# print("Next possible actions: ")
-			# print(Planner.printHistory(next_actions))
+
 			if len(next_actions) == 0:
 				print("GOT STUCK!")
-				#We are stuck
-				#Remove the current action from history
 				#Update the action
+				#Use deepcopy so that if need to backtrack later don't mess stuff up
 				curr_node.specifiedaction.state = deepcopy(curr_node.history[-2].state)
 				curr_node.specifiedaction.action = deepcopy(curr_node.history[-2].action)
+				#Remove the current action from history
 				curr_node.history.pop()
 				return checkBacktrack(curr_node)
 
@@ -107,45 +80,46 @@ class Planner():
 
 		#Initialization
 		print("Initializing Causal planner....")
-		#A node is an action and a state tuple
-		#(action, state)
 
-		#In order to get out of dead end states, should just be able to traverse
-		#back up the history chain??
-
-		#Deepcopy so dont mutate passed in state
+		#Get valid actions copies from a domain so don't need to worry about mutation
 		valid_actions = self.domain.getValidActions(self.domain.state)
+
+		#Sanity check
 		if len(valid_actions) == 0:
 			print("ERROR: No possible actions from initial state!")
 			exit(0)
 
-		
-		curr_action = CausalModel.chooseNextAction(valid_actions)
 		#Deep copy because if backtrack to initial state, don't want to manipulate states
+		#This special first action holds the first initial state before no action has been done
+		#This is why its action type is none
+		#Effectively each state stored w an action in the history is the state after an action has been applied
 		first_specified_action = deepcopy(curr_action)
 		first_specified_action.action = None
 
+		#Pick first valid action
+		curr_action = CausalModel.chooseNextAction(valid_actions)
+		#Place into node
 		curr_node = self.Node(curr_action, [first_specified_action])
 
+		#While the current state is not the goal state
 		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
-			# print(curr_node)
-			#Unpack the node into action and parameters
 			action = curr_node.specifiedaction
 
-			# print("STATE BEFORE")
-			print("ACTION: " + str(action))
+			print("Action: " + str(action.action.name) + str(action.parameters))
+
+			#Perform the perviously defined action
 			action.action.doAction(action.state, action.parameters[0], action.parameters[1])
-			# print("STATE AFTER")
-			# print(action.state)
+			
+			#Record the action and resultant state in the history
 			curr_node.history.append(deepcopy(action))
 
-			#Update current node
+			#Update current node for next loop
+			#Check for dead ends and find next actions
 			next_actions = checkBacktrack(curr_node)
-
 			curr_node.specifiedaction = CausalModel.chooseNextAction(next_actions)
 
 		print("Final plan:")	
-		print(Planner.strHistoryMoves(curr_node.history))
-		print("DONE")
+		Planner.printHistory(curr_node.history)
+
 		return curr_node.history
 

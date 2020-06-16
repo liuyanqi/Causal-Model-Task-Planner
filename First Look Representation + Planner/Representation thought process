@@ -142,4 +142,6 @@ With it disabled it crashes because it gets stuck... time to enable backtracking
 
 Ok what the fuck do I do now????
 
-Main priority getting the backtracking to work?
+Main priority getting the backtracking to work? Ok so it works, but it doesn't prohibit that same ation b/c of environment non linearities
+
+I think my definitions of history are the same, but I am not entirelly sure about that

@@ -75,8 +75,5 @@ class SpecificAction():
 		self.state = state
 
 	def __str__(self):
-		if self.action == None:
-			return "Undefined action" + str(self.state)
-		else:
-			return str(self.action.name) + " " + str(self.parameters) + " \n" + str(self.state) 
+		return str(self.action.name) + " " + str(self.parameters) + " \n" + str(self.state) 
 
