@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 import itertools
 import customerrors
+from copy import deepcopy
 
 class Domain():
 	def __init__(self, state):
@@ -23,7 +24,7 @@ class Domain():
 					action.checkPredicates(state, b1, b2)
 				except customerrors.PredicateFailed as e:
 					continue
-				actions.append(SpecificAction(action, [b1,b2], state))
+				actions.append(SpecificAction(action, [b1,b2], deepcopy(state)))
 		return actions
 
 
@@ -74,5 +75,8 @@ class SpecificAction():
 		self.state = state
 
 	def __str__(self):
-		return str(self.action.name) + " (" + str(self.parameters) + ")"
+		if self.action == None:
+			return "Undefined action" + str(self.state)
+		else:
+			return str(self.action.name) + " " + str(self.parameters) + " \n" + str(self.state) 
 

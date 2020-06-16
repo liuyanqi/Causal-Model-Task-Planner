@@ -59,8 +59,52 @@ class Planner():
 
 		return ret
 
+	@staticmethod
+	def printHistory(histarr):
+		ret = []
+		for h in histarr:
+			print(str(h))
+
+		return ret
+
+	@staticmethod
+	def strHistoryMoves(histarr):
+		ret = []
+		for h in histarr:
+			if h.action != None:
+				print(str(h.action.name) + " " +str(h.parameters))
+
+		return ret
+
 
 	def planCausal(self):
+		
+		def checkBacktrack(curr_node):
+			#OK wait this should go back to previous state
+			#Something is messed up here
+
+			# print("In backtrack")
+			# print("Curr state:")
+			# print(curr_node.specifiedaction.state)
+			# print("Current history: ")
+			Planner.strHistory(curr_node.history)
+			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
+			# print("Next possible actions: ")
+			# print(Planner.printHistory(next_actions))
+			if len(next_actions) == 0:
+				print("GOT STUCK!")
+				#We are stuck
+				#Remove the current action from history
+				#Update the action
+				curr_node.specifiedaction.state = deepcopy(curr_node.history[-2].state)
+				curr_node.specifiedaction.action = deepcopy(curr_node.history[-2].action)
+				curr_node.history.pop()
+				return checkBacktrack(curr_node)
+
+			return next_actions
+
+
+
 		#Initialization
 		print("Initializing Causal planner....")
 		#A node is an action and a state tuple
@@ -70,24 +114,38 @@ class Planner():
 		#back up the history chain??
 
 		#Deepcopy so dont mutate passed in state
-		curr_node = self.Node(deepcopy(CausalModel.chooseNextAction(self.domain.getValidActions(self.domain.state))), [])
+		valid_actions = self.domain.getValidActions(self.domain.state)
+		if len(valid_actions) == 0:
+			print("ERROR: No possible actions from initial state!")
+			exit(0)
+
+		
+		curr_action = CausalModel.chooseNextAction(valid_actions)
+		#Deep copy because if backtrack to initial state, don't want to manipulate states
+		first_specified_action = deepcopy(curr_action)
+		first_specified_action.action = None
+
+		curr_node = self.Node(curr_action, [first_specified_action])
 
 		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
-			print(curr_node)
+			# print(curr_node)
 			#Unpack the node into action and parameters
 			action = curr_node.specifiedaction
-			curr_history = curr_node.history
 
+			# print("STATE BEFORE")
+			print("ACTION: " + str(action))
 			action.action.doAction(action.state, action.parameters[0], action.parameters[1])
-
-			#Now find all the next possible actions and add them to the actions list
-			curr_history.append(action)
+			# print("STATE AFTER")
+			# print(action.state)
+			curr_node.history.append(deepcopy(action))
 
 			#Update current node
-			curr_node.history = curr_history
-			curr_node.specifiedaction = CausalModel.chooseNextAction(self.domain.getValidActions(action.state))
+			next_actions = checkBacktrack(curr_node)
+
+			curr_node.specifiedaction = CausalModel.chooseNextAction(next_actions)
 
 		print("Final plan:")	
-		print(Planner.strHistory(curr_node.history))
+		print(Planner.strHistoryMoves(curr_node.history))
+		print("DONE")
 		return curr_node.history
 

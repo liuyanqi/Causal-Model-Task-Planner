@@ -136,3 +136,10 @@ Was also thinking that the Monte Carlo Tree search might help Semir's problem of
 
 Could set it up rn, such that if gets in impossible state, it recognizes it and tries again. I think this is what I will do for now
 
+Ok so with unstack enabled, it will never get stuck
+
+With it disabled it crashes because it gets stuck... time to enable backtracking!!!
+
+Ok what the fuck do I do now????
+
+Main priority getting the backtracking to work?

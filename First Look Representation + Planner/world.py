@@ -120,7 +120,7 @@ class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
 		self.stack = stack(self)
-		self.unstack = unstack(self)
+		# self.unstack = unstack(self)
 
 class Block():
 	def __init__(self, name, stackable, weight, stacked = False, top = False):
@@ -141,6 +141,8 @@ class Block():
 
 if __name__ == "__main__":
 	domain = BlockTower()
+	# domain.stack.doAction(domain.state, "floor", "b")
+	# print(domain.state)
 	myPlan = Planner(domain)
 	myPlan.planCausal()
 	# state = BlockTowerState()
