@@ -10,15 +10,28 @@ class CausalModel():
 				scount += 1
 			else:
 				ucount += 1
+
+		if scount != 0 and ucount != 0:
+			s_cum_prob = 0.8
+			u_cum_prob = 0.2
+		elif scount != 0:
+			s_cum_prob = 1
+			u_cum_prob = 0
+		elif ucount != 0:
+			s_cum_prob = 0
+			u_cum_prob = 1
+		else:
+			print("NO VALID ACTIONS???")
+
 		if scount != 0:
-			sprob =  1 / scount
-		else: 
-			scount = 0
+			sprob =  s_cum_prob / scount
+		else:
+			sprob = 0
 
 		if ucount != 0:
-			uprob =  1 / ucount
-		else: 
-			ucount = 0
+			uprob =  u_cum_prob / ucount
+		else:
+			uprob = 0
 
 		probs = []
 		for action in actionslist:

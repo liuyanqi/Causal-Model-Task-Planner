@@ -145,3 +145,14 @@ Ok what the fuck do I do now????
 Main priority getting the backtracking to work? Ok so it works, but it doesn't prohibit that same ation b/c of environment non linearities
 
 I think my definitions of history are the same, but I am not entirelly sure about that
+
+Do action needs to be changed so that it can be called w the parameters array rather than specific parameters
+
+Then need typing metadata for smarter parameter enumeration
+
+Ok smarter parameter enumeration. So I need each doAction to apply their own parameters correctly, so that should be fine. 
+
+Then I just have to worry about types
+
+I should also modularize the planne's search algorithm
+

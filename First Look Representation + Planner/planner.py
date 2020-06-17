@@ -76,8 +76,6 @@ class Planner():
 
 			return next_actions
 
-
-
 		#Initialization
 		print("Initializing Causal planner....")
 
@@ -89,6 +87,9 @@ class Planner():
 			print("ERROR: No possible actions from initial state!")
 			exit(0)
 
+		#Pick first valid action
+		curr_action = CausalModel.chooseNextAction(valid_actions)
+
 		#Deep copy because if backtrack to initial state, don't want to manipulate states
 		#This special first action holds the first initial state before no action has been done
 		#This is why its action type is none
@@ -96,8 +97,6 @@ class Planner():
 		first_specified_action = deepcopy(curr_action)
 		first_specified_action.action = None
 
-		#Pick first valid action
-		curr_action = CausalModel.chooseNextAction(valid_actions)
 		#Place into node
 		curr_node = self.Node(curr_action, [first_specified_action])
 
@@ -109,7 +108,10 @@ class Planner():
 
 			#Perform the perviously defined action
 			action.action.doAction(action.state, action.parameters[0], action.parameters[1])
-			
+			print("State")
+			print(action.state)
+
+
 			#Record the action and resultant state in the history
 			curr_node.history.append(deepcopy(action))
 

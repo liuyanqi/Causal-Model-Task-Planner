@@ -50,6 +50,7 @@ class stack(Action):
 		b1.top = False
 		b2.top = True
 		b2.stacked = True
+		b2.on = b1_name
 		state.total_weight += b2.weight
 
 class unstack(Action):
@@ -69,6 +70,11 @@ class unstack(Action):
 
 		stacked = (lambda x: x.stacked)
 		top = (lambda x: x.top)
+		on = (lambda x, y: x.on == y.name)
+
+
+		if not on(b2, b1):
+			raise err.PredicateFailed()
 
 		checkPredicateTrue(stacked, b1)
 		checkPredicateTrue(stacked, b2)
@@ -83,6 +89,7 @@ class unstack(Action):
 		b2.stacked = False
 		b2.top = False
 		b1.top = True
+		b2.on = None
 		state.total_weight -= b2.weight
 
 
@@ -120,7 +127,7 @@ class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
 		self.stack = stack(self)
-		# self.unstack = unstack(self)
+		self.unstack = unstack(self)
 
 class Block():
 	def __init__(self, name, stackable, weight, stacked = False, top = False):
@@ -129,9 +136,10 @@ class Block():
 		self.top = top
 		self.stackable = stackable
 		self.weight = weight
+		self.on = None
 
 	def __str__(self):
-		return "(" + self.name + ") " + "Stacked: " + str(self.stacked) + " Top: " + str(self.top) + " Stackable: " + str(self.stackable) + " Weight: " + str(self.weight) + "\n"
+		return "(" + self.name + ") " + "Stacked: " + str(self.stacked) + " Top: " + str(self.top) + " Stackable: " + str(self.stackable) + " On: " + str(self.on) + " Weight: " + str(self.weight) + "\n"
 
 	def __eq__(self, other):
 		return ((((self.stacked == other.stacked) 
