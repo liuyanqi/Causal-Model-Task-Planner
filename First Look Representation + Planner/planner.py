@@ -6,6 +6,7 @@ from copy import deepcopy
 import random
 from causalmodel import CausalModel 
 
+
 class Planner():
 	class Node():
 		def __init__(self, specifiedaction, history):
@@ -13,12 +14,21 @@ class Planner():
 			self.history = history
 
 		def __str__(self):
-			return "Action: " + str(self.specifiedaction) + " History: " + str(Planner.strHistory(self.history))
+			return "Action: " + str(self.specifiedaction) + " History: " + str(self.history)
 
 	def __init__(self, domain):
 		self.domain = domain
+	
+	def setAlgo(self, algo):
+		self.algo = algo
 
-	def planBFS(self):
+	def plan(self):
+		if self.algo == None:
+			raise TypeError("Need to set the planning algo first!")
+		return self.algo()
+
+	@staticmethod
+	def BFS(self):
 		def addNodes(state, history):
 			for specifiedaction in self.domain.getValidActions(state):
 				next_nodes.append(self.Node(deepcopy(specifiedaction), deepcopy(history)))
@@ -41,10 +51,11 @@ class Planner():
 			action = curr_node.specifiedaction
 			curr_history = curr_node.history
 
-			action.action.doAction(action.state, action.parameters[0], action.parameters[1])
+			action.action.doAction(action.state, action.parameters)
 
 			#Now find all the next possible actions and add them to the actions list
 			curr_history.append(action)
+			# Planner.printHistory(curr_history)
 			addNodes(action.state, curr_history)
 
 			curr_node = next_nodes.pop(0)
@@ -57,14 +68,15 @@ class Planner():
 			if h.action != None:
 				print(str(h.action.name) + " " +str(h.parameters))
 
-	def planCausal(self):
+	@staticmethod
+	def Causal(self, chooseNextAction):
 		#This function checks if the current state is a "dead end state" and no more actions can be taken
 		#If that is the case, this function recursively backtracks until it finds a state that has valid actions
 		#Then it returns those valid actions
 		def checkBacktrack(curr_node):
 			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
 
-			if len(next_actions) == 0:
+			if (len(next_actions) == 0): #and not curr_node.specifiedaction.state.isGoalSatisfied()):
 				print("GOT STUCK!")
 				#Update the action
 				#Use deepcopy so that if need to backtrack later don't mess stuff up
@@ -88,7 +100,7 @@ class Planner():
 			exit(0)
 
 		#Pick first valid action
-		curr_action = CausalModel.chooseNextAction(valid_actions)
+		curr_action = chooseNextAction(valid_actions)
 
 		#Deep copy because if backtrack to initial state, don't want to manipulate states
 		#This special first action holds the first initial state before no action has been done
@@ -107,7 +119,8 @@ class Planner():
 			print("Action: " + str(action.action.name) + str(action.parameters))
 
 			#Perform the perviously defined action
-			action.action.doAction(action.state, action.parameters[0], action.parameters[1])
+			print(action.parameters)
+			action.action.doAction(action.state, action.parameters)
 			print("State")
 			print(action.state)
 
@@ -118,10 +131,7 @@ class Planner():
 			#Update current node for next loop
 			#Check for dead ends and find next actions
 			next_actions = checkBacktrack(curr_node)
-			curr_node.specifiedaction = CausalModel.chooseNextAction(next_actions)
-
-		print("Final plan:")	
-		Planner.printHistory(curr_node.history)
+			curr_node.specifiedaction = chooseNextAction(next_actions)
 
 		return curr_node.history
 

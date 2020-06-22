@@ -1,31 +1,16 @@
 import customerrors as err
 from planner import *
-from abstracttypes import Action, Domain, State
+from abstracttypes import Action, Domain, State, getType, checkPredicateTrue, checkParams
 from causalmodel import CausalModel
-
-def getType(obj):
-		return type(obj).__name__
-
-def checkType(obj, expected):
-	objType = getType(obj)
-	if objType != expected:
-		raise err.WrongInputType(objType, expected)
-
-def checkPredicateTrue(lambd, obj):
-	if not(lambd(obj)):
-		raise err.PredicateFailed()
+from riverworld import RiverState, RiverWorld
+import functools
 
 class stack(Action):
 	def __init__(self, state, name = "stack"):
 		super().__init__(state, name)
+		self.param_types = ["Block", "Block"]
 
-	def checkTypes(self, state, b1_name: str, b2_name: str):
-		b1 = state.get(b1_name)
-		b2 = state.get(b2_name)
-
-		checkType(b1, "Block")
-		checkType(b2, "Block")
-
+	@checkParams
 	def checkPredicates(self, state, b1_name: str, b2_name: str):
 		b1 = state.get(b1_name)
 		b2 = state.get(b2_name)
@@ -41,8 +26,9 @@ class stack(Action):
 		checkPredicateTrue(stacked, b1)
 		checkPredicateTrue(notstacked, b2)
 
+	@checkParams
 	def doAction(self, state, b1_name: str, b2_name: str):
-		self.checkPredicates(state, b1_name, b2_name)
+		self.checkPredicates(state, [b1_name, b2_name])
 
 		b1 = state.get(b1_name)
 		b2 = state.get(b2_name)
@@ -56,14 +42,9 @@ class stack(Action):
 class unstack(Action):
 	def __init__(self, domain, name = "unstack"):
 		super().__init__(domain, name)
+		self.param_types = ["Block", "Block"]
 
-	def checkTypes(self, state, b1_name: str, b2_name: str):
-		b1 = state.get(b1_name)
-		b2 = state.get(b2_name)
-
-		checkType(b1, "Block")
-		checkType(b2, "Block")
-
+	@checkParams
 	def checkPredicates(self, state, b1_name: str, b2_name: str):
 		b1 = state.get(b1_name)
 		b2 = state.get(b2_name)
@@ -80,8 +61,10 @@ class unstack(Action):
 		checkPredicateTrue(stacked, b2)
 		checkPredicateTrue(top, b2)
 
+
+	@checkParams
 	def doAction(self, state, b1_name: str, b2_name: str):
-		self.checkPredicates(state, b1_name, b2_name)
+		self.checkPredicates(state, [b1_name, b2_name])
 
 		b1 = state.get(b1_name)
 		b2 = state.get(b2_name)
@@ -127,7 +110,7 @@ class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
 		self.stack = stack(self)
-		self.unstack = unstack(self)
+		# self.unstack = unstack(self)
 
 class Block():
 	def __init__(self, name, stackable, weight, stacked = False, top = False):
@@ -149,11 +132,16 @@ class Block():
 
 if __name__ == "__main__":
 	domain = BlockTower()
-	# domain.stack.doAction(domain.state, "floor", "b")
-	# print(domain.state)
 	myPlan = Planner(domain)
-	myPlan.planCausal()
-	# state = BlockTowerState()
-	# actions = domain.getValidActions(state)
-	# print(CausalModel.chooseNextAction(actions))
+	# myPlan.setAlgo(functools.partial(myPlan.BFS, self=myPlan))
+	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, chooseNextAction=CausalModel.chooseNextAction))
+	Planner.printHistory(myPlan.plan())
+
+
+	# domain = RiverWorld()
+	# actions = domain.getValidActions(domain.state)
+	# # for a in actions:
+	# # 	print(a)
+	# myPlan = Planner(domain)
+	# myPlan.planCausal(CausalModel.chooseUniformAction)
 

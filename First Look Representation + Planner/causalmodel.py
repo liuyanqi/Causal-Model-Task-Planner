@@ -12,8 +12,8 @@ class CausalModel():
 				ucount += 1
 
 		if scount != 0 and ucount != 0:
-			s_cum_prob = 0.8
-			u_cum_prob = 0.2
+			s_cum_prob = 0.9
+			u_cum_prob = 0.1
 		elif scount != 0:
 			s_cum_prob = 1
 			u_cum_prob = 0
@@ -56,5 +56,9 @@ class CausalModel():
 		probs = CausalModel.__getActionProbabilities(specifiedactions)
 		next_action = specifiedactions[sampleProbs(probs)]
 		return next_action
+
+	@staticmethod
+	def chooseUniformAction(specifiedactions):
+		return random.choice(specifiedactions)
 
 

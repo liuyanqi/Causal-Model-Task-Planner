@@ -12,19 +12,30 @@ class Domain():
 
 	def getValidActions(self, state):
 		actions = []
-		possible_inputs = list(itertools.combinations(state.obj_names, 2))
-		for i in range(len(possible_inputs)):
-			possible_inputs.append(possible_inputs[i][::-1])
-	
-		for action in self.actions:
-			for i in possible_inputs:
-				b1 = i[0]
-				b2 = i[1]
+
+		#Loop through all the possible actions of the domain
+		for a in self.actions:
+			list_to_product = []
+
+			#This is making a list of lists of objects that are valid for each parameter
+			for param in a.param_types:
+				list_to_product.append(state.obj_types[param])
+
+			#Now we have a list of parameters that meet the specified type
+			type_valid_params = list(itertools.product(*list_to_product))
+
+			for params in type_valid_params:
+				#Now we have to check that the type correct parameters
+				#satisfy the predicates before we can consider the action valid
 				try:
-					action.checkPredicates(state, b1, b2)
+					a.checkPredicates(state, list(params))
 				except customerrors.PredicateFailed as e:
 					continue
-				actions.append(SpecificAction(action, [b1,b2], deepcopy(state)))
+
+				#Create a new specific action with the parameters and state
+				#Add it to the possible actions list
+				actions.append(SpecificAction(a, list(params), deepcopy(state)))
+
 		return actions
 
 
@@ -34,11 +45,20 @@ class State(ABC):
 		self.obj_dict = {}
 		self.obj_names = []
 		self.objects = []
+		self.obj_types = {}
 
 	def addObject(self, obj):
 		self.obj_dict[obj.name] = obj
 		self.obj_names = list(self.obj_dict.keys())
 		self.objects = list(self.obj_dict.values())
+		obj_type = type(obj).__name__
+
+		try:
+			self.obj_types[obj_type].append(obj.name)
+		except KeyError as e:
+			#We have no record of that type yet
+			self.obj_types[obj_type] = [obj.name]
+		
 
 	def get(self, name):
 		return self.obj_dict[name]
@@ -64,10 +84,6 @@ class Action(ABC):
 	def doAction(self, state):
 		pass
 
-	@abstractmethod
-	def checkTypes(self, state):
-		pass
-
 class SpecificAction():
 	def __init__(self, action, parameters, state):
 		self.action = action
@@ -75,5 +91,36 @@ class SpecificAction():
 		self.state = state
 
 	def __str__(self):
-		return str(self.action.name) + " " + str(self.parameters) + " \n" + str(self.state) 
+		return str(self.action.name) + " " + str(self.parameters) + " \n" #+ str(self.state) 
 
+
+def getType(obj):
+		return type(obj).__name__
+
+def checkType(obj, expected):
+	objType = getType(obj)
+	if objType != expected:
+		raise customerrors.WrongInputType(objType, expected)
+
+def checkPredicateTrue(lambd, obj):
+	if not(lambd(obj)):
+		raise customerrors.PredicateFailed()
+
+
+def checkParams(func):
+	def func_wrapper(self, state, params):
+		if len(params) != len(self.param_types):
+			raise ValueError("Wrong number of parameters")
+
+		objs = []
+		for p in params:
+			objs.append(state.get(p))
+
+		for x in range(len(params)):
+			correct_type = self.param_types[x]
+			passed_type = getType(objs[x])
+			if correct_type != passed_type:
+				raise ValueError("Wrong parameter type. Param number: " + str(x) + " Expected: " + correct_type + " Found: " + passed_type)
+
+		return func(*([self, state] + params))
+	return func_wrapper

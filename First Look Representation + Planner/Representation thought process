@@ -152,7 +152,54 @@ Then need typing metadata for smarter parameter enumeration
 
 Ok smarter parameter enumeration. So I need each doAction to apply their own parameters correctly, so that should be fine. 
 
+Ok so given an action, and that action's parameters type metadata and number of parameters, I can have an action decorator that is like check_types that gives custom error messages for any given parameter
+
+So parameter metadata. Ohhh crappp, I am passing names not actual object. So in order to actually get type inference, I think I am going to actually need to pass in objects so I can tell what type of object they are. But I feel like there was some reason for passing in name rather than the object itself.
+
+Ok well I can try to refactor.
+
+This would get rid of entirelly the checkTypes function with the checkParams decorator. 
+
+Decorator w kwargs definitely gives a lot more expressiveness to the action setup. Then could have an action w no object parameters
+
+Ok so I think why I decided to only include the names of the objects was because I wanted actions to apply to states directly. I seperated out the states because otherwise you have to copy the domain every time and the actions. 
+
+
+Let's look at where all the action methods are called and see why they might be requiring name passing
+ - getValidActions which I am going to change anyway. It iterates through the list of object names
+ - Also current action function definition doesn't really make a bunch of sense because state contains the object info themselves, so if pass in the objects, then also get duplicate info. But also need the whole 
+ - The biggest problem is dealing with state in the node expansion of the search algorithm, and 
+
+ Ok so I should be able to do the predicate checking with the object names by just accessing the underlying object
+
+Guess what its time for: decorator time
+
+Ok so fixed a decorator error
+
+So now, gonna fix type enumeration
+
+
 Then I just have to worry about types
 
-I should also modularize the planne's search algorithm
+I should also modularize the planner's search algorithm
 
+Also an extension later should be to prevent revisiting identical states. Basically every backtrack would then store the action that caused the backtrack, although not sure how this would be included in the causal model and not sure whether that is even relevant to the project itself.
+
+Need to refactor to get rid of checktypes. Also need to refactor to get rid of specified action, state pairs
+
+Ok, plan for today...
+I want to have a stopwatch that actually logs how much time I spend working. 
+
+Goals to acheive by the end of the day:
+ - Comment it pretty well
+ - Read through the other Monte Carlo papers that I sent Semir
+ - Implement the new visual input model
+  - Visual states of the model
+  - Test it on a more contrived example...
+
+It should only take max like an hour to get the first part done
+
+
+Ohh also Jasmine wanted me to get rid of stackable predicates and stuff in the PDDL
+
+Ok so now why doesn't the BFS planner work?
