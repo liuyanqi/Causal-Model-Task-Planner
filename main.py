@@ -19,6 +19,6 @@ if __name__ == "__main__":
 
 	#Uncomment to run Causal model with visual model
 	viz_func = functools.partial(CausalModel.chooseNextActionVisual, viz=viz, domain=domain)
-	myPlan.setAlgo(functools.partial(myPlan.Causal2, self=myPlan, pickBestAction=viz_func))
+	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=viz_func))
 
 	Planner.printHistory(myPlan.plan())

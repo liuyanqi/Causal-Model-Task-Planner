@@ -1,0 +1,9 @@
+This repository contains code for a proof of concept planner.
+PDDL like code is used to define a world state, and the planner plans actions in that world.
+
+Running the whole program starts from main.py.
+
+Defining a specific problem domain follows the following structure. 
+First implement a State subclass to contain the world state
+Then write subclasses of the Action class that represent all possible actions in that world
+Then simply in the init of your specific domain class (a subclass of Domain). Super an initialized state variable of your domain. Then set "your_domain"."action_name" to be the function describing an action. This hooks in the action class into the metadata of the domain and allows it to work

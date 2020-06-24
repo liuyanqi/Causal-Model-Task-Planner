@@ -1,5 +1,4 @@
 import inspect
-# import world
 import customerrors
 import itertools
 from copy import deepcopy
@@ -74,90 +73,9 @@ class Planner():
 			if h.action != None:
 				print(str(h.action.name) + " " +str(h.parameters))
 
-	@staticmethod
-	def Causal(self, chooseNextAction):
-		#This function checks if the current state is a "dead end state" and no more actions can be taken
-		#If that is the case, this function recursively backtracks until it finds a state that has valid actions
-		#Then it returns those valid actions
-		def checkBacktrack(curr_node):
-			print("CURRENT NODE")
-			print(curr_node.specifiedaction.state)
-			print(curr_node.specifiedaction.action)
-			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
-
-			if (len(next_actions) == 0):# and not curr_node.specifiedaction.state.isGoalSatisfied()):
-				print("GOT STUCK!")
-				#Update the action
-				#Use deepcopy so that if need to backtrack later don't mess stuff up
-				print("YYYY")
-				print(curr_node.specifiedaction.state)
-				curr_node.specifiedaction.state = deepcopy(curr_node.history[-2].state)
-				print("YYYYYYYY")
-				print(curr_node.specifiedaction.state)
-				curr_node.specifiedaction.action = deepcopy(curr_node.history[-2].action)
-				#Remove the current action from history
-				print("XXX")
-				print(len(curr_node.history))
-				curr_node.history.pop()
-				print("XXXXXXX")
-				print(len(curr_node.history))
-				return checkBacktrack(curr_node)
-
-			return next_actions
-
-		#Initialization
-		print("Initializing Causal planner....")
-		nodes_touched = 0
-
-		#Get valid actions copies from a domain so don't need to worry about mutation
-		valid_actions = self.domain.getValidActions(self.domain.state)
-
-		#Sanity check
-		if len(valid_actions) == 0:
-			print("ERROR: No possible actions from initial state!")
-			exit(0)
-
-		#Pick first valid action
-		curr_action = chooseNextAction(actionslist=valid_actions)
-
-		#Deep copy because if backtrack to initial state, don't want to manipulate states
-		#This special first action holds the first initial state before no action has been done
-		#This is why its action type is none
-		#Effectively each state stored w an action in the history is the state after an action has been applied
-		first_specified_action = deepcopy(curr_action)
-		first_specified_action.action = None
-
-		#Place into node
-		curr_node = self.Node(curr_action, [first_specified_action])
-
-		#While the current state is not the goal state
-		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
-			nodes_touched += 1
-			action = curr_node.specifiedaction
-
-			print("Action: " + str(action.action.name) + str(action.parameters))
-
-			#Perform the perviously defined action
-			print(action.parameters)
-			action.action.doAction(action.state, action.parameters)
-			print("State")
-			print(action.state)
-
-
-			#Record the action and resultant state in the history
-			curr_node.history.append(deepcopy(action))
-
-			#Update current node for next loop
-			#Check for dead ends and find next actions
-			next_actions = checkBacktrack(curr_node)
-			curr_node.specifiedaction = chooseNextAction(next_actions)
-
-		print("Nodes touched: " + str(nodes_touched))
-		return curr_node.history
-
 
 	@staticmethod
-	def Causal2(self, pickBestAction):
+	def Causal(self, pickBestAction):
 		#Initialization
 		nodes_touched = 0
 

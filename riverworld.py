@@ -3,6 +3,7 @@ from blockworld import checkParams
 import customerrors
 
 #This entire state representation is messed
+#This doesn't work as required yet
 
 class RiverState(State):
 	def __init__(self):
