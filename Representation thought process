@@ -191,7 +191,6 @@ Ok, plan for today...
 I want to have a stopwatch that actually logs how much time I spend working. 
 
 Goals to acheive by the end of the day:
- - Comment it pretty well
  - Read through the other Monte Carlo papers that I sent Semir
  - Implement the new visual input model
   - Visual states of the model
@@ -199,7 +198,36 @@ Goals to acheive by the end of the day:
 
 It should only take max like an hour to get the first part done
 
+Maybe add a collect stats method so can determine how tweaks to the causal functions and algos change plan time
+
 
 Ohh also Jasmine wanted me to get rid of stackable predicates and stuff in the PDDL
 
-Ok so now why doesn't the BFS planner work?
+Visual model overview:
+ - Create own hardcoded visual transition function for states of the world
+ - Create second level predicate processing from the visual information
+  - Plug that higher level probability information into a causal model
+  - Have causal model generate a heuristic for that action
+  - Somehow incorporate the goal
+  - Then normalize those generated heuristics and return as a probability distribution
+
+
+Ok so changed the dynamics of the system. Now any block can be stacked on in the beginning. To stack a on b, b has to be at the top, and a cant have been stacked before, otherwise unstack is implicit
+
+Gonna want to refactor so that access to domain and visual model is easier
+
+Hmmm, some of the output probabilities don't really seem right
+
+I want to now check the output probabilities and maybe tweak the transition model
+
+Clean up the search printing to illustrate the visual model
+
+Ohhh, model doesn't take into account future changes of stackability in its heuristics???!!!
+
+Why does it recalculate possible actions twice???
+
+I am confusion
+
+
+
+

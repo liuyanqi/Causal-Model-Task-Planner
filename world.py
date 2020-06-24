@@ -110,7 +110,7 @@ class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
 		self.stack = stack(self)
-		# self.unstack = unstack(self)
+		self.unstack = unstack(self)
 
 class Block():
 	def __init__(self, name, stackable, weight, stacked = False, top = False):
@@ -129,19 +129,4 @@ class Block():
 		and self.top == other.top)
 		and self.stackable == other.stackable)
 		and self.weight == other.weight)
-
-if __name__ == "__main__":
-	domain = BlockTower()
-	myPlan = Planner(domain)
-	# myPlan.setAlgo(functools.partial(myPlan.BFS, self=myPlan))
-	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, chooseNextAction=CausalModel.chooseNextAction))
-	Planner.printHistory(myPlan.plan())
-
-
-	# domain = RiverWorld()
-	# actions = domain.getValidActions(domain.state)
-	# # for a in actions:
-	# # 	print(a)
-	# myPlan = Planner(domain)
-	# myPlan.planCausal(CausalModel.chooseUniformAction)
 

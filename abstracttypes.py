@@ -58,7 +58,6 @@ class State(ABC):
 		except KeyError as e:
 			#We have no record of that type yet
 			self.obj_types[obj_type] = [obj.name]
-		
 
 	def get(self, name):
 		return self.obj_dict[name]
@@ -105,7 +104,6 @@ def checkType(obj, expected):
 def checkPredicateTrue(lambd, obj):
 	if not(lambd(obj)):
 		raise customerrors.PredicateFailed()
-
 
 def checkParams(func):
 	def func_wrapper(self, state, params):

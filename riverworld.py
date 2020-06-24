@@ -1,5 +1,5 @@
 from abstracttypes import Action, Domain, State, getType, checkPredicateTrue
-from world import checkParams
+from blockworld import checkParams
 import customerrors
 
 #This entire state representation is messed
