@@ -16,8 +16,9 @@ class Planner():
 		def __str__(self):
 			return "Action: " + str(self.specifiedaction) + " History: " + str(self.history)
 
-	def __init__(self, domain):
+	def __init__(self, domain, goal):
 		self.domain = domain
+		self.goal = goal
 	
 	def setAlgo(self, algo):
 		self.algo = algo
@@ -37,6 +38,7 @@ class Planner():
 
 		#Initialization
 		print("Initializing BFS planner....")
+		
 		#A node is an action and a state tuple
 		#(action, state)
 
@@ -100,7 +102,8 @@ class Planner():
 		curr_node = self.Node(curr_action, [first_specified_action])
 
 		#While the current state is not the goal state
-		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
+		# while not(curr_node.specifiedaction.state.isGoalSatisfied()):
+		while not(self.goal.isSatisfied(curr_node.specifiedaction.state)):
 	
 			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
 			
@@ -122,6 +125,7 @@ class Planner():
 			#Perform the perviously defined action
 			nodes_touched += 1
 			action.action.doAction(action.state, action.parameters)
+
 			print("-> Performed action: " + str(action.parameters))
 			print("New state: ")
 			print(action.state)

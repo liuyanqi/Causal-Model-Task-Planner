@@ -3,11 +3,16 @@ from planner import Planner
 import functools
 from causalmodel import CausalModel
 from visualmodel import BlockVisualModel
+from blockworld import Goal
 
+
+#TODO
+#Try w unreasonable goal, and find out why crashes/ encode terminal state
+#
 
 if __name__ == "__main__":
 	domain = BlockTower()
-	myPlan = Planner(domain)
+	myPlan = Planner(domain, Goal(height=4))
 
 	viz = BlockVisualModel(domain)
 

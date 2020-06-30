@@ -70,7 +70,6 @@ class CausalModel():
 		#Get their weights as well
 		heur_array = []
 
-
 		for action in actionslist:
 			stackability = viz_model.getStackability(action.parameters[0], action.parameters[1])
 			tot_weight = domain.state.get(action.parameters[0]).weight + domain.state.get(action.parameters[1]).weight

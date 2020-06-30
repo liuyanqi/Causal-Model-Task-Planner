@@ -23,13 +23,20 @@ class stack(Action):
 		if b1_name == b2_name:
 			raise err.PredicateFailed("Can't stack block on self")
 
-		print("[" + b1_name + ", " + b2_name + "]")
-		print("Probability of stacking: " + str(state.visual.flatness_vals[b1_name]))
-		if random.random() > state.visual.flatness_vals[b1_name]:
-			#Stack should fail
-			print("Stacking failed")
+
+		# Non deterministic stacking
+		# print("[" + b1_name + ", " + b2_name + "]")
+		# print("Probability of stacking: " + str(state.visual.flatness_vals[b1_name]))
+		# if random.random() > state.visual.flatness_vals[b1_name]:
+		# 	#Stack should fail
+		# 	print("Stacking failed")
+		# 	raise err.PredicateFailed("Not stackable enough!")
+		# print("Stacking succeeded")
+
+		if state.visual.getStackability(b1_name, b2_name) < 0.3:
+			print("Not stackable enough")
 			raise err.PredicateFailed("Not stackable enough!")
-		print("Stacking succeeded")
+
 
 
 	@checkParams
@@ -42,6 +49,7 @@ class stack(Action):
 		if b1.on == None:
 			b1.on = "floor"
 			state.total_weight += b1.weight
+			state.total_height += b1.height
 
 		b1.top = False
 		b2.top = True
@@ -49,6 +57,7 @@ class stack(Action):
 		b1.stacked = True
 		b2.on = b1_name
 		state.total_weight += b2.weight
+		state.total_height += b2.height
 
 class unstack(Action):
 	def __init__(self, domain, name = "unstack"):
@@ -89,10 +98,11 @@ class unstack(Action):
 class BlockTowerState(State):
 	def __init__(self):
 		super().__init__()
-		self.addObject(Block("a", 1))
-		self.addObject(Block("b", 1))
-		self.addObject(Block("c", 3))
+		self.addObject(Block("a", 1, 1))
+		self.addObject(Block("b", 1, 2))
+		self.addObject(Block("c", 3, 2))
 		self.total_weight = 0
+		self.total_height = 0
 
 	def __eq__(self, other):
 		for objname in self.objname:
@@ -121,12 +131,13 @@ class BlockTower(Domain):
 		# self.unstack = unstack(self) 
 
 class Block():
-	def __init__(self, name, weight, stacked = False, top = True):
+	def __init__(self, name, weight, height, stacked = False, top = True):
 		self.name = name
 		self.stacked = stacked
 		self.top = top
 		self.weight = weight
 		self.on = None
+		self.height = height
 
 	def __str__(self):
 		return "(" + self.name + ") " + "Stacked: " + str(self.stacked) + " Top: " + str(self.top) + " On: " + str(self.on) + " Weight: " + str(self.weight) + "\n"
@@ -135,4 +146,30 @@ class Block():
 		return (((self.stacked == other.stacked) 
 		and self.top == other.top)
 		and self.weight == other.weight)
+
+class Goal():
+	def __init__(self, weight=None, height=None):
+		self.weight = weight
+		self.height = height
+
+	def isSatisfied(self, state):
+		w = False
+		h = False
+
+		if self.weight != None:
+			if state.total_weight > self.weight:
+				w = True
+		else:
+			w = True
+
+		if self.height != None:
+			if state.total_height > self.height:
+				h = True
+		else:
+			h = True
+
+		return (h and w)
+
+
+
 
