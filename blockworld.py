@@ -3,8 +3,8 @@ from abstracttypes import Action, Domain, State, getType, checkPredicateTrue, ch
 import random
 
 class stack(Action):
-	def __init__(self, state, name = "stack"):
-		super().__init__(state, name)
+	def __init__(self, domain):
+		super().__init__(domain)
 		self.param_types = ["Block", "Block"]
 
 	@checkParams
@@ -17,8 +17,16 @@ class stack(Action):
 		notstacked = (lambda x: not(x.stacked))
 		top = (lambda x: x.top)
 
+		
 		checkPredicateTrue(top, b1)
 		checkPredicateTrue(notstacked, b2)
+
+
+		#Only one tower allowed
+		if not(state.no_placement_yet):
+			#Check that b1.on != None
+			if b1.on == None:
+				raise err.PredicateFailed("Can only make one tower")
 
 		if b1_name == b2_name:
 			raise err.PredicateFailed("Can't stack block on self")
@@ -33,8 +41,9 @@ class stack(Action):
 		# 	raise err.PredicateFailed("Not stackable enough!")
 		# print("Stacking succeeded")
 
+		#Normal
 		if state.visual.getStackability(b1_name, b2_name) < 0.3:
-			print("Not stackable enough")
+		# if state.visual.getStackability(b1_name, b2_name) < 0.476:
 			raise err.PredicateFailed("Not stackable enough!")
 
 
@@ -46,10 +55,13 @@ class stack(Action):
 		b1 = state.get(b1_name)
 		b2 = state.get(b2_name)
 
+		# Multi tower enabled
 		if b1.on == None:
 			b1.on = "floor"
 			state.total_weight += b1.weight
 			state.total_height += b1.height
+			# Single tower
+			state.no_placement_yet = False
 
 		b1.top = False
 		b2.top = True
@@ -60,8 +72,8 @@ class stack(Action):
 		state.total_height += b2.height
 
 class unstack(Action):
-	def __init__(self, domain, name = "unstack"):
-		super().__init__(domain, name)
+	def __init__(self, domain):
+		super().__init__(domain)
 		self.param_types = ["Block", "Block"]
 
 	@checkParams
@@ -98,11 +110,34 @@ class unstack(Action):
 class BlockTowerState(State):
 	def __init__(self):
 		super().__init__()
+		# #Normal
 		self.addObject(Block("a", 1, 1))
 		self.addObject(Block("b", 1, 2))
 		self.addObject(Block("c", 3, 2))
+
+		# T1
+		# self.addObject(Block("a", 3, 0))
+		# self.addObject(Block("b", 3, 0))
+		# self.addObject(Block("c", 3, 0))
+		# self.addObject(Block("d", 2, 0))
+		# self.addObject(Block("e", 4, 0))
+		# self.addObject(Block("f", 3, 0))
+		# self.addObject(Block("g", 3, 0))
+		# self.addObject(Block("h", 3, 0))
+		# self.addObject(Block("i", 3, 0))
+		# self.addObject(Block("j", 3, 0))
+		# self.addObject(Block("k", 3, 0))
+		# self.addObject(Block("l", 3, 0))
+		# self.addObject(Block("m", 3, 0))
+		# self.addObject(Block("n", 3, 0))
+		# self.addObject(Block("o", 3, 0))
+		# self.addObject(Block("p", 3, 0))
+
+
 		self.total_weight = 0
 		self.total_height = 0
+
+		self.no_placement_yet = True
 
 	def __eq__(self, other):
 		for objname in self.objname:
@@ -123,6 +158,8 @@ class BlockTowerState(State):
 
 	def isGoalSatisfied(self):
 		return self.total_weight > 4
+		#T1
+		# return self.total_weight > 8
 
 class BlockTower(Domain):
 	def __init__(self):

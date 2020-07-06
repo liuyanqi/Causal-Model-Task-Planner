@@ -65,7 +65,7 @@ class CausalModel():
 		return random.choice(specifiedactions)
 
 	@staticmethod
-	def _getVisualProbabilities(actionslist, viz_model, domain):
+	def _getVisualProbabilities(actionslist, viz_model, domain, debug):
 		#For each action get the stackability of the blocks
 		#Get their weights as well
 		heur_array = []
@@ -76,22 +76,25 @@ class CausalModel():
 
 			heur_array.append(stackability + tot_weight)
 
-		retstr = "["
-		for a in actionslist:
-			retstr += a.action.name + str(a.parameters) + ", "
 
-		retstr += "]"
-		print("Current possible actions: ")
-		print(retstr)
 		ret = softmax(np.array(heur_array))
-		print("Probabilities of those actions: ")
-		print(str(ret) + "\n")
+
+		if debug:
+			retstr = "["
+			for a in actionslist:
+				retstr += type(a.action).__name__ + str(a.parameters) + ", "
+
+			retstr += "]"
+			print("Current possible actions: ")
+			print(retstr)
+			print("Probabilities of those actions: ")
+			print(str(ret) + "\n")
 
 		return ret
 
 	@staticmethod
-	def chooseNextActionVisual(actionslist, viz, domain):
-		probs = CausalModel._getVisualProbabilities(actionslist, viz, domain)
+	def chooseNextActionVisual(actionslist, viz, domain, debug=False):
+		probs = CausalModel._getVisualProbabilities(actionslist, viz, domain, debug)
 		x = CausalModel.sampleProbs(probs)
 		viz.update(domain.state)
 		return actionslist[x]

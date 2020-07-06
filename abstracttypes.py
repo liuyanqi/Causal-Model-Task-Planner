@@ -66,14 +66,19 @@ class State(ABC):
 	def isGoalSatisfied(self):
 		pass
 
+	# def __eq__(self, obj):
+	# 	for o in self.objects:
+	# 		if o != obj:
+	# 			return False
+	# 	return True
+
 #Abstract action class
 #This ensures that an action follows the correct function pattern
 #and has its names stored correctly for enumeration by the planner
 class Action(ABC):
-	def __init__(self, domain, name):
+	def __init__(self, domain):
 		self.domain = domain
 		self.domain.actions.append(self)
-		self.name = name
 
 	@abstractmethod
 	def checkPredicates(self, state):
@@ -90,8 +95,13 @@ class SpecificAction():
 		self.state = state
 
 	def __str__(self):
-		return str(self.action.name) + " " + str(self.parameters) + " \n" #+ str(self.state) 
+		if self.action == None:
+			return "None"
+		else:
+			return str(self.action.name) + " " + str(self.parameters) #+ str(self.state) 
 
+	def __eq__(self, obj):
+		return (self.parameters == obj.parameters and self.state == obj.state)
 
 def getType(obj):
 		return type(obj).__name__
@@ -117,8 +127,15 @@ def checkParams(func):
 		for x in range(len(params)):
 			correct_type = self.param_types[x]
 			passed_type = getType(objs[x])
-			if correct_type != passed_type:
-				raise ValueError("Wrong parameter type. Param number: " + str(x) + " Expected: " + correct_type + " Found: " + passed_type)
+			if type(correct_type).__name__ != "list":
+				#If the type parameter is just a single object
+				if correct_type != passed_type:
+					raise ValueError("Wrong parameter type. Param number: " + str(x) + " Expected: " + correct_type + " Found: " + passed_type)
+			else:
+				#If there are multiple valid types that an action can be applied to
+				if passed_type not in correct_type:
+					raise ValueError("Wrong parameter type. Param number: " + str(x) + " Expected: " + str(correct_type) + " Found: " + passed_type)
+
 
 		return func(*([self, state] + params))
 	return func_wrapper

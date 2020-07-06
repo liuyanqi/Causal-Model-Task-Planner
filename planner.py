@@ -5,6 +5,8 @@ from copy import deepcopy
 import random
 from causalmodel import CausalModel 
 from abstracttypes import SpecificAction
+import time
+import statistics
 
 
 class Planner():
@@ -26,10 +28,48 @@ class Planner():
 	def plan(self):
 		if self.algo == None:
 			raise TypeError("Need to set the planning algo first!")
-		return self.algo()
+		return self.algo()[0]
+
+	def collectStats(self, num_times):
+		plans = {}
+		nodes = []
+		backtracks = []
+		time = []
+
+		for _ in range(num_times):
+			res = self.algo()
+			plan = tuple(map((lambda x: str(x)), res[0]))
+			# print(plan)
+
+			try:
+				plans[plan] += 1
+			except KeyError as e:
+				#We have no record of that plan yet
+				plans[plan] = 1
+
+
+
+			nodes.append(res[1])
+			backtracks.append(res[2])
+			time.append(res[3])
+
+
+		### Implement sorter of plans from most popular to least
+
+		sorted_plans = {k: v for k, v in sorted(plans.items(), key=lambda item: item[1], reverse=True)}
+
+		print()
+		print("------- Statistics ------- (" + str(num_times) + " runs)")
+		print("All plans: " + str(sorted_plans))
+		print("Avg nodes touched: " + str(statistics.mean(nodes)))
+		print("Avg backtracks: " + str(statistics.mean(backtracks)))
+		print("Avg time: " + str(statistics.mean(time)))
+
 
 	@staticmethod
 	def BFS(self):
+		debug = True
+		start_time = time.time()
 		nodes_touched = 0
 
 		def addNodes(state, history):
@@ -38,7 +78,7 @@ class Planner():
 
 		#Initialization
 		print("Initializing BFS planner....")
-		
+
 		#A node is an action and a state tuple
 		#(action, state)
 
@@ -48,9 +88,15 @@ class Planner():
 		#Add all current possible actions to BFS
 		addNodes(self.domain.state, [])
 
-		curr_node = next_nodes.pop(0)
+		curr_node = self.Node(SpecificAction(None, None, self.domain.state), [])
 
 		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
+			curr_node = next_nodes.pop(0)
+
+			if debug:
+				print(type(curr_node.specifiedaction.action).__name__ + " " + str(curr_node.specifiedaction.parameters))
+				print(curr_node.specifiedaction.state)
+
 			nodes_touched += 1
 			#Unpack the node into action and parameters
 			action = curr_node.specifiedaction
@@ -60,26 +106,32 @@ class Planner():
 
 			#Now find all the next possible actions and add them to the actions list
 			curr_history.append(action)
+
 			# Planner.printHistory(curr_history)
 			addNodes(action.state, curr_history)
 
-			curr_node = next_nodes.pop(0)
 
 		print("Nodes touched: " + str(nodes_touched))
-
-		return curr_node.history
+		time_taken = time.time() - start_time
+		print("--- BFS Planner took %s seconds ---" % (time_taken))
+		return [tuple(curr_node.history), nodes_touched, 0, time_taken]
 
 	@staticmethod
 	def printHistory(histarr):
 		for h in histarr:
 			if h.action != None:
-				print(str(h.action.name) + " " +str(h.parameters))
+				print(str(type(h.action).__name__) + " " +str(h.parameters))
 
 
 	@staticmethod
 	def Causal(self, pickBestAction):
+		debug = True
+
+
 		#Initialization
 		nodes_touched = 0
+		backtracks = 0
+		start_time = time.time()
 
 		#Get valid actions copies from a domain so don't need to worry about mutation
 		valid_actions = self.domain.getValidActions(self.domain.state)
@@ -102,14 +154,16 @@ class Planner():
 		curr_node = self.Node(curr_action, [first_specified_action])
 
 		#While the current state is not the goal state
-		# while not(curr_node.specifiedaction.state.isGoalSatisfied()):
-		while not(self.goal.isSatisfied(curr_node.specifiedaction.state)):
+		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
+		# while not(self.goal.isSatisfied(curr_node.specifiedaction.state)):
 	
 			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
 			
 			#We are at a "dead end" state
 			if len(next_actions) == 0:
-				print("Stuck... backtracking")
+				# if debug:
+					# print("Stuck... backtracking")
+				backtracks += 1
 				#Want to revert state to a previous state, and try and
 				#find some new actions
 				curr_node.specifiedaction.state = deepcopy(curr_node.history[-2].state)
@@ -118,7 +172,7 @@ class Planner():
 				#Restart and try and get new actions from beginning
 				continue
 
-			curr_node.specifiedaction = pickBestAction(next_actions)
+			curr_node.specifiedaction = pickBestAction(next_actions, debug=True)
 			
 			action = curr_node.specifiedaction
 
@@ -126,14 +180,19 @@ class Planner():
 			nodes_touched += 1
 			action.action.doAction(action.state, action.parameters)
 
-			print("-> Performed action: " + str(action.parameters))
-			print("New state: ")
-			print(action.state)
+			if debug:
+				print("-> Performed action: " + str(action.parameters))
+				# print("New state: ")
+				# print(action.state)
 
 			#Record the action and resultant state in the history
 			curr_node.history.append(deepcopy(action))
 			
+		time_taken = (time.time() - start_time)
 
-		print("Nodes touched: " + str(nodes_touched))
-		return curr_node.history
+		if debug:
+			print("Nodes touched: " + str(nodes_touched))
+			print("Backtracks taken: " + str(backtracks))
+			print("--- Causal Planner took %s seconds ---" % time_taken)
+		return [tuple(curr_node.history), nodes_touched, backtracks, time_taken]
 

@@ -7,10 +7,36 @@ class BlockVisualModel():
 		self.blocks = domain.state.obj_types["Block"]
 
 		self.flatness_vals = {}
+		# Normal
 		self.flatness_vals["a"] = {"top": random.randrange(0, 20)/100, "bottom": random.randrange(0, 20)/100}
 		self.flatness_vals["b"] = {"top": random.randrange(50, 90)/100, "bottom": random.randrange(50, 90)/100}
 		self.flatness_vals["c"] = {"top": random.randrange(50, 90)/100, "bottom": random.randrange(50, 90)/100}
 		
+		# Reflective of Triangle
+		# self.flatness_vals["a"] = {"top": 0.05, "bottom": 0.9}
+		# self.flatness_vals["b"] = {"top": 0.5, "bottom": 0.9}
+		# self.flatness_vals["c"] = {"top": 0.9, "bottom": 0.9}
+
+		#T1
+		# self.flatness_vals["a"] = {"top": 0.05, "bottom": 0.9}
+		# self.flatness_vals["b"] = {"top": 0.5, "bottom": 0.9}
+		# self.flatness_vals["c"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["d"] = {"top": 0.05, "bottom": 0.9}
+		# self.flatness_vals["e"] = {"top": 0.05, "bottom": 0.9}
+		# self.flatness_vals["f"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["g"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["h"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["i"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["j"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["k"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["l"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["m"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["n"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["o"] = {"top": 0.9, "bottom": 0.9}
+		# self.flatness_vals["p"] = {"top": 0.9, "bottom": 0.9}
+
+		
+
 		print("Initial flatness values: ")
 		print(str(self.flatness_vals) + "\n")
 
