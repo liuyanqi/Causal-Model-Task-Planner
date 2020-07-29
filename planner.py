@@ -18,9 +18,8 @@ class Planner():
 		def __str__(self):
 			return "Action: " + str(self.specifiedaction) + " History: " + str(self.history)
 
-	def __init__(self, domain, goal):
+	def __init__(self, domain):
 		self.domain = domain
-		self.goal = goal
 	
 	def setAlgo(self, algo):
 		self.algo = algo
@@ -122,6 +121,31 @@ class Planner():
 			if h.action != None:
 				print(str(type(h.action).__name__) + " " +str(h.parameters))
 
+	# @staticmethod
+	# def getStacks(histarr):
+	# 	print(histarr)
+
+	# 	stackarr = []
+	# 	if len(histarr) <= 2:
+	# 		print("Whoops, histarr too small!")
+
+	# 	stackarr.append(histarr[1].parameters[0])
+	# 	stackarr.append(histarr[1].parameters[1])
+
+	# 	for x in range(2, len(histarr)):
+	# 		h = histarr[x]
+	# 		stackarr.append(h.parameters[1])
+		
+	# 	return stackarr
+
+	def parseHistorytoList(self, histarr):
+		retarr = []
+		for h in histarr:
+			if h.action != None:
+				name = type(h.action).__name__
+				retarr.append([type(h.action).__name__, h.parameters])
+
+		return retarr
 
 	@staticmethod
 	def Causal(self, pickBestAction):
@@ -142,6 +166,8 @@ class Planner():
 			exit(0)
 
 		curr_action = SpecificAction(None, None, deepcopy(self.domain.state))
+		print("In planner")
+		print(self.domain.state)
 
 		#Deep copy because if backtrack to initial state, don't want to manipulate states
 		#This special first action holds the first initial state before no action has been done
@@ -161,8 +187,8 @@ class Planner():
 			
 			#We are at a "dead end" state
 			if len(next_actions) == 0:
-				# if debug:
-					# print("Stuck... backtracking")
+				if debug:
+					print("Stuck... backtracking")
 				backtracks += 1
 				#Want to revert state to a previous state, and try and
 				#find some new actions
@@ -172,18 +198,20 @@ class Planner():
 				#Restart and try and get new actions from beginning
 				continue
 
-			curr_node.specifiedaction = pickBestAction(next_actions, debug=True)
+			curr_node.specifiedaction = pickBestAction(next_actions)
 			
 			action = curr_node.specifiedaction
 
 			#Perform the perviously defined action
 			nodes_touched += 1
+			print("Old state: ")
+			print(action.state)
 			action.action.doAction(action.state, action.parameters)
 
 			if debug:
-				print("-> Performed action: " + str(action.parameters))
-				# print("New state: ")
-				# print(action.state)
+				print("-> Performed action: " + str(type(action.action).__name__) + " " + str(action.parameters))
+				print("New state: ")
+				print(action.state)
 
 			#Record the action and resultant state in the history
 			curr_node.history.append(deepcopy(action))

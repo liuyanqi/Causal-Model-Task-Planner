@@ -38,7 +38,6 @@ class Domain():
 
 		return actions
 
-
 # This superclass maintains a list of objects and their names in a domain state
 class State(ABC):
 	def __init__(self):
@@ -102,6 +101,9 @@ class SpecificAction():
 
 	def __eq__(self, obj):
 		return (self.parameters == obj.parameters and self.state == obj.state)
+
+	def __str__(self):
+		return str(self.parameters)
 
 def getType(obj):
 		return type(obj).__name__

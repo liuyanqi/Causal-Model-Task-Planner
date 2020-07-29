@@ -7,10 +7,18 @@ class BlockVisualModel():
 		self.blocks = domain.state.obj_types["Block"]
 
 		self.flatness_vals = {}
+
+		#Binary
+		self.flatness_vals["a"] = {"top": 0, "bottom": 0.8}
+		self.flatness_vals["b"] = {"top": 1, "bottom": 1}
+		self.flatness_vals["c"] = {"top": 1, "bottom": 1}
+		self.flatness_vals["d"] = {"top": 1, "bottom": 1}
+
+
 		# Normal
-		self.flatness_vals["a"] = {"top": random.randrange(0, 20)/100, "bottom": random.randrange(0, 20)/100}
-		self.flatness_vals["b"] = {"top": random.randrange(50, 90)/100, "bottom": random.randrange(50, 90)/100}
-		self.flatness_vals["c"] = {"top": random.randrange(50, 90)/100, "bottom": random.randrange(50, 90)/100}
+		# self.flatness_vals["a"] = {"top": random.randrange(0, 20)/100, "bottom": random.randrange(0, 20)/100}
+		# self.flatness_vals["b"] = {"top": random.randrange(50, 90)/100, "bottom": random.randrange(50, 90)/100}
+		# self.flatness_vals["c"] = {"top": random.randrange(50, 90)/100, "bottom": random.randrange(50, 90)/100}
 		
 		# Reflective of Triangle
 		# self.flatness_vals["a"] = {"top": 0.05, "bottom": 0.9}
@@ -95,7 +103,10 @@ class BlockVisualModel():
 	# 		else:
 	# 			print("ERROR IN VISUALMODEL! IDK THIS BLOCK: " + str(block))
 
-	def getStackability(self, a, b):
-		return (self.flatness_vals[a]["top"] + self.flatness_vals[b]["bottom"])/2
+	def getFlatnessVals(self, obj_name):
+		return self.flatness_vals[obj_name]
+
+	# def getStackability(self, a, b):
+	# 	return (self.flatness_vals[a]["top"] + self.flatness_vals[b]["bottom"])/2
 
 

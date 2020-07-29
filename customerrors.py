@@ -15,3 +15,9 @@ class WrongInputType(Error):
 class PredicateFailed(Error):
 	def __init__(self, message="Error: predicate failed!"):
 		super().__init__(message)
+
+
+class SimulationOver(Error):
+	def __init__(self, message):
+		self.message = message
+		super().__init__(message)
