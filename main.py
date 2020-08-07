@@ -8,6 +8,7 @@ from riverworld import RiverWorld
 from heuristicgenerator import HeuristicGenerator
 from visualizer import runSim
 from customerrors import SimulationOver
+from abstracttypes import SpecificAction
 
 # from pypddlparser.pddlparser import PDDLParser
 # from pypddlparser import main
@@ -41,9 +42,26 @@ def runSimulation(myplanner):
 if __name__ == "__main__":
 
 	domain = BlockTower()
-	viz = BlockVisualModel(domain)
-	print(causalmodel.generateCausalModel("./pypddl_parser/pypddl_parser/pddl/tower/domain.pddl", domain))
+	myPlan = Planner(domain)
+	causalmodel.generateCausalModels("./pypddl_parser/pypddl_parser/pddl/tower/domain.pddl", domain)
+	# print(cm[0].runModel(SpecificAction(domain.stack, ["a", "b"], domain.state)))
 
+
+	heur = HeuristicGenerator(domain)
+	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction))
+	runSimulation(myPlan)
+
+	print(domain.causal_models)
+	
+	'''
+	Add causal models to a domain
+	For each action search through the causal models to find one who matches in name
+	If no matches, raise error
+	Or could do model completeness checking earlier
+	'''
+
+
+	# print(cm.getPredicates(SpecificAction(domain.stack, ["a", "b"], domain.state)))
 
 	'''
 	# #------Block Domain----------

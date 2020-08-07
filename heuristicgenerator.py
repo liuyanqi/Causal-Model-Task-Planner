@@ -1,10 +1,10 @@
 import numpy as np
-from causalmodel import CausalModel
+from causalmodel import CausalModel, sampleProbs
 import math
 
 class HeuristicGenerator():
-	def __init__(self, causal_model):
-		self.causal = causal_model
+	def __init__(self, domain):
+		self._domain = domain
 
 	def _stack_heuristic(self, action):
 		predicates = self.causal.getPredicates(action)
@@ -37,8 +37,8 @@ class HeuristicGenerator():
 			# 	stackability_array.append(-2)
 			# 	weight_array.append(-2)
 			# else:
-			predicates = self.causal.getPredicates(action)
-			stackability = predicates["stackability"]
+			predicates = self._domain.causal_models[type(action.action).__name__].runModel(action)
+			stackability = predicates["stackable"]
 			weight = action.state.get(action.parameters[0]).weight + action.state.get(action.parameters[1]).weight
 			stackability_array.append(stackability)
 			weight_array.append(weight)
@@ -114,7 +114,7 @@ class HeuristicGenerator():
 
 	def chooseNextAction(self, actionslist):
 		probs = self._getVisualProbabilities(actionslist, False)
-		x = CausalModel.sampleProbs(probs)
+		x = sampleProbs(probs)
 		return actionslist[x]
 
 

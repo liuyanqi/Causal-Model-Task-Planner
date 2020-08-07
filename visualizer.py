@@ -383,8 +383,6 @@ class CharacterCollision(Framework):
                         self.bottom_block = [params[0], self.stack(params[0], params[1])]
                     else:
                         self.stack(params[0], params[1])
-
-                    
                 else:
                     self.unstack(params[0])
             else:

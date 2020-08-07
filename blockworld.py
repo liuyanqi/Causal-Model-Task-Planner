@@ -1,6 +1,7 @@
 import customerrors as err
 from abstracttypes import Action, Domain, State, getType, checkPredicateTrue, checkParams
 import random
+from visualmodel import BlockVisualModel
 
 class stack(Action):
 	def __init__(self, domain):
@@ -130,6 +131,7 @@ class BlockTowerState(State):
 		self.addObject(Block("b", 1, 2, "square"))
 		self.addObject(Block("c", 3, 2, "square"))
 		self.addObject(Block("d", 1, 2, "square"))
+		BlockVisualModel().initState(self)
 
 		# T1
 		# self.addObject(Block("a", 3, 0))

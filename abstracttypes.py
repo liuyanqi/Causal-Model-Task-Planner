@@ -9,6 +9,7 @@ class Domain():
 		self.actions = []
 		#Stores a current state object
 		self.state = state
+		self.causal_models = []
 
 	def checkActionExists(self, name):
 		for a in self.actions:

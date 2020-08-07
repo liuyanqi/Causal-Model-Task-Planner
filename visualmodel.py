@@ -1,21 +1,19 @@
 import random
 
 class BlockVisualModel():
-	def __init__(self, domain):
-		self.domain = domain
-		self.domain.state.visual = self
-		self.blocks = domain.state.obj_types["Block"]
+	
 
+	def __init__(self):
 		self.flatness_vals = {}
-
-		#Binary
 		self.flatness_vals["a"] = {"top": 0, "bottom": 1}
 		self.flatness_vals["b"] = {"top": 1, "bottom": 1}
 		self.flatness_vals["c"] = {"top": 1, "bottom": 1}
 		self.flatness_vals["d"] = {"top": 1, "bottom": 1}
+		
 
+	def initState(self, state):
 		for bname, flatness_dict in self.flatness_vals.items():
-			self.domain.state.get(bname).flatness = flatness_dict
+			state.get(bname).flatness = flatness_dict
 
 		# Normal
 		# self.flatness_vals["a"] = {"top": random.randrange(0, 20)/100, "bottom": random.randrange(0, 20)/100}
