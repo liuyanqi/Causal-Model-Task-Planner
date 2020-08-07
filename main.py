@@ -1,19 +1,55 @@
 from blockworld import BlockTower
 from planner import Planner
 import functools
-from causalmodel import CausalModel
+import causalmodel
 from visualmodel import BlockVisualModel
-from blockworld import Goal
+from blockworld import Goal, BlockTowerState
 from riverworld import RiverWorld
 from heuristicgenerator import HeuristicGenerator
 from visualizer import runSim
 from customerrors import SimulationOver
 
+# from pypddlparser.pddlparser import PDDLParser
+# from pypddlparser import main
+# import pypddl_parser.pypddl_parser.pddlparser
+# import pypddl_parser.pypddl_parser.main
+
+def runSimulation(myplanner):
+	# temp_state = BlockTowerState()
+	# temp_state.get("a").on = "b"
+	# temp_state.get("b").on = "d"
+	# temp_state.get("d").on = "c"
+	# temp_state.total_weight = 2
+
+
+
+	res = myplanner.plan()
+	Planner.printHistory(res)
+	try:
+		# myplanner.domain.state = temp_state
+		runSim(res, myplanner)
+	except SimulationOver as e:
+		print(type(e.message))
+		if e.message == None:
+			print("Sucess! Goal acheived")
+		else:
+			domain.state = e.message
+			runSimulation(myplanner)
+		
+
 
 if __name__ == "__main__":
+
+	domain = BlockTower()
+	viz = BlockVisualModel(domain)
+	print(causalmodel.generateCausalModel("./pypddl_parser/pypddl_parser/pddl/tower/domain.pddl", domain))
+
+
+	'''
 	# #------Block Domain----------
 	domain = BlockTower()
 	myPlan = Planner(domain)
+
 
 	#Uncomment to run BFS
 	# viz = BlockVisualModel(domain)
@@ -38,11 +74,19 @@ if __name__ == "__main__":
 	causal = CausalModel(viz)
 	heur = HeuristicGenerator(causal)
 	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction))
-	print(domain.state)
+	runSimulation(myPlan)
+
+
+
+	# print(domain.state)
 	# myPlan.collectStats(1000)
-	res = myPlan.plan()
-	Planner.printHistory(res)
-	runSim(res, myPlan)
+	# res = myPlan.plan()
+	# Planner.printHistory(res)
+	# simret = runSim(res, myPlan)
+	# if simret != None:
+	# 	domain.state = copy.deepcopy(simret)
+
+
 
 
 	#--------------River Domain----------------------
@@ -54,3 +98,4 @@ if __name__ == "__main__":
 	# domain.state.get("Boat").inside = "wolf"
 	# domain.cross.doAction(domain.state, ["Boat"])
 	# print(domain.state)
+	'''

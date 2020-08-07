@@ -9,11 +9,13 @@ class BlockVisualModel():
 		self.flatness_vals = {}
 
 		#Binary
-		self.flatness_vals["a"] = {"top": 0, "bottom": 0.8}
+		self.flatness_vals["a"] = {"top": 0, "bottom": 1}
 		self.flatness_vals["b"] = {"top": 1, "bottom": 1}
 		self.flatness_vals["c"] = {"top": 1, "bottom": 1}
 		self.flatness_vals["d"] = {"top": 1, "bottom": 1}
 
+		for bname, flatness_dict in self.flatness_vals.items():
+			self.domain.state.get(bname).flatness = flatness_dict
 
 		# Normal
 		# self.flatness_vals["a"] = {"top": random.randrange(0, 20)/100, "bottom": random.randrange(0, 20)/100}
@@ -45,8 +47,8 @@ class BlockVisualModel():
 
 		
 
-		print("Initial flatness values: ")
-		print(str(self.flatness_vals) + "\n")
+		# print("Initial flatness values: ")
+		# print(str(self.flatness_vals) + "\n")
 
 		self.total_weight = 0
 		self.total_height = 0

@@ -166,8 +166,8 @@ class Planner():
 			exit(0)
 
 		curr_action = SpecificAction(None, None, deepcopy(self.domain.state))
-		print("In planner")
-		print(self.domain.state)
+		# print("In planner")
+		# print(self.domain.state)
 
 		#Deep copy because if backtrack to initial state, don't want to manipulate states
 		#This special first action holds the first initial state before no action has been done
@@ -204,14 +204,15 @@ class Planner():
 
 			#Perform the perviously defined action
 			nodes_touched += 1
-			print("Old state: ")
-			print(action.state)
+			# print("Old state: ")
+			# print(action.state)
 			action.action.doAction(action.state, action.parameters)
 
 			if debug:
-				print("-> Performed action: " + str(type(action.action).__name__) + " " + str(action.parameters))
-				print("New state: ")
-				print(action.state)
+				# print("-> Performed action: " + str(type(action.action).__name__) + " " + str(action.parameters))
+				# print("New state: ")
+				# print(action.state)
+				pass
 
 			#Record the action and resultant state in the history
 			curr_node.history.append(deepcopy(action))
@@ -219,8 +220,9 @@ class Planner():
 		time_taken = (time.time() - start_time)
 
 		if debug:
-			print("Nodes touched: " + str(nodes_touched))
-			print("Backtracks taken: " + str(backtracks))
-			print("--- Causal Planner took %s seconds ---" % time_taken)
+			# print("Nodes touched: " + str(nodes_touched))
+			# print("Backtracks taken: " + str(backtracks))
+			# print("--- Causal Planner took %s seconds ---" % time_taken)
+			pass
 		return [tuple(curr_node.history), nodes_touched, backtracks, time_taken]
 

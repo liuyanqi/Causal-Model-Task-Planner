@@ -152,11 +152,14 @@ class BlockTowerState(State):
 
 		self.total_weight = 0
 		self.total_height = 0
-
 		self.no_placement_yet = True
 
 	def __eq__(self, other):
-		for objname in self.objname:
+		if other == None:
+			return False
+
+
+		for objname in self.obj_names:
 			if self.get(objname) == other.get(objname):
 				pass
 			else:
@@ -167,6 +170,7 @@ class BlockTowerState(State):
 
 	def __str__(self):
 		ret = "Weight: " + str(self.total_weight) + "\n"
+		ret  += "no place yet: " + str(self.no_placement_yet) + " \n"
 		
 		for x in self.objects:
 			ret += str(x)
@@ -206,8 +210,8 @@ class Block():
 		return "(" + self.name + ") " + "Clear: " + str(self.clear) + " On: " + str(self.on) + " Weight: " + str(self.weight) + "\n"
 
 	def __eq__(self, other):
-		return (((self.stacked == other.stacked) 
-		and self.top == other.top)
+		return (((self.on == other.on) 
+		and self.clear == other.clear)
 		and self.weight == other.weight)
 
 class Goal():

@@ -19,7 +19,7 @@ startTime = 0
 timeBetweenStacks = 3
 
 class CharacterCollision(Framework):
-    def __init__(self, plan, shape_dict):
+    def __init__(self, plan, shape_dict, state):
         super(CharacterCollision, self).__init__()
         print("Initializing simulator...")
         global startTime
@@ -34,6 +34,7 @@ class CharacterCollision(Framework):
         self.shape_dict = shape_dict
         self.plan = plan
         self.bottom_block = None
+        self.state = state
 
         # box1 = self.world.CreateDynamicBody(
         #     position=(-3, 20),
@@ -107,6 +108,47 @@ class CharacterCollision(Framework):
 
 
         self.initShapesOnGround()
+        self.initTower()
+
+    def initTower(self):
+        '''
+        Plan is to create dict of who is on who
+        Figure out who is in values, but not in keys
+        That will be bottom block
+        Then remove that entry and repeat to get whole tower from bottom up
+        '''
+
+        tower = self.towerFromState()
+        # print(tower)
+        for x in range(0, len(tower)-1, 1):
+            # print(str(tower[x]) + " " + str(tower[x+1]))
+            self.stack(tower[x], tower[x+1], jostling=False)
+        
+
+    #Modifies state to remove that entry
+    def towerFromState(self):
+        on_dict = {}
+        for o in self.state.objects:
+            if o.on != "floor":
+                on_dict[o.name] = o.on
+
+
+        tower = []
+        while len(on_dict) > 0:
+            keys = list(on_dict.keys())
+            vals = list(on_dict.values())
+            if len(on_dict) == 1:
+                tower.append(vals[0])
+                tower.append(keys[0])
+                on_dict.pop(keys[0])
+            else:
+                
+                for v in vals:
+                    if v not in keys:
+                        tower.append(v)
+                        on_dict.pop(keys[vals.index(v)])
+        return tower
+
 
     def initShapesOnGround(self):
         for block_name in self.shape_dict:
@@ -195,7 +237,7 @@ class CharacterCollision(Framework):
         return copy.copy(self.objs[name].position[0])
 
     #a and b here are the names of the blocks
-    def stack(self, b1, b2):
+    def stack(self, b1, b2, jostling = True):
         stack_height = 15
         # #This weird hardcoded offset is so that boxes are unbalanced and don't sleep on triangles
         # if self.shape_dict[b1] == "triangle":
@@ -217,11 +259,14 @@ class CharacterCollision(Framework):
              coord = (self.getBlockXCoord(b1) + 0.2, stack_height)
         #This adds nondeterminism to stacking squares together
         elif b2 == "c" or b2 == "b":
-            if random.randint(0, 1):
-                offset = random.randrange(20, 40, 1) / 10
-                sign = random.choice([-1, 1])
-                coord = (self.getBlockXCoord(b1) + (offset * sign), stack_height)
-                print("Tower was jostled!")
+            if jostling:
+                if random.randint(0, 1):
+                    offset = random.randrange(20, 40, 1) / 10
+                    sign = random.choice([-1, 1])
+                    coord = (self.getBlockXCoord(b1) + (offset * sign), stack_height)
+                    print("Tower was jostled!")
+                else:
+                    coord = (self.getBlockXCoord(b1), stack_height)
             else:
                 coord = (self.getBlockXCoord(b1), stack_height)
         else:
@@ -273,11 +318,15 @@ class CharacterCollision(Framework):
                             if ((names not in alreadyseen) and (normal[1] == 1 or normal[1] == -1)):
                                 alreadyseen.append(names)
                                 if normal[1] > 0:
+                                    print("Recorded " + str(below) + " on " + str(above))
                                     state.get(below).on = above
+                                    state.get(above).clear = False
                                     state.total_weight += state.get(below).weight
                                     state.total_height += state.get(below).height
                                 else:
+                                    print("Recorded " + str(above) + " on " + str(below))
                                     state.get(above).on = below
+                                    state.get(below).clear = False
                                     state.total_weight += state.get(above).weight
                                     state.total_height += state.get(above).height
 
@@ -291,6 +340,7 @@ class CharacterCollision(Framework):
         if on_floor:
             state.total_height = 0
             state.total_weight = 0
+            state.no_placement_yet = True
 
         return state
 
@@ -316,8 +366,10 @@ class CharacterCollision(Framework):
 
         if self.didTowerFall():
             print("Unexpected, action failed")
-            print(self.updateState())
-            sys.exit(0)
+            recovered_state = self.updateState()
+            print("State recovered:")
+            print(recovered_state)
+            raise SimulationOver(recovered_state)
 
         elapsed = time.time() - self.startTime
         if elapsed > timeBetweenStacks:
@@ -340,9 +392,9 @@ class CharacterCollision(Framework):
                 #Think about ending the simulation
                 if self.shouldEndSim(): 
                     print("Simulation complete")
-                    print("Recovered state: ")
-                    print(self.updateState())
-                    raise SimulationOver(self.didTowerFall())
+                    # print("Recovered state: ")
+                    # print(self.updateState())
+                    raise SimulationOver(None)
 
 
 
@@ -364,13 +416,14 @@ class CharacterCollision(Framework):
 def runSim(res, planner):
     plan = planner.parseHistorytoList(res)
     shape_dict = planner.domain.state.getShapeDict()
+    state = planner.domain.state
 
-    try:
-        c = CharacterCollision(plan, shape_dict)
-        c.run()
-    except SimulationOver as e:
-        if e.message:
-            print("The tower fell over")
-        else:
-            print("The tower stayed up")
+   
+    c = CharacterCollision(plan, shape_dict, state)
+    c.run()
+    # except SimulationOver as e:
+    #     if e.message:
+    #         print("The tower fell over")
+    #     else:
+    #         print("The tower stayed up")
 

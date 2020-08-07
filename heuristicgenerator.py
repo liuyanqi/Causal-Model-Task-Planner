@@ -14,7 +14,7 @@ class HeuristicGenerator():
 
 		#SHOULD DO INDEPENDANT NORMALIZATION HERE
 		#Might work better if do weight normalization, then stackability will work
-		print(stackability + tot_weight)
+		# print(stackability + tot_weight)
 		return stackability + tot_weight
 
 	@staticmethod
@@ -32,7 +32,7 @@ class HeuristicGenerator():
 		weight_array = []
 		stackability_array = []
 		for action in actionslist:
-			print(str(type(action.action).__name__) + " " + str(action.parameters))
+			# print(str(type(action.action).__name__) + " " + str(action.parameters))
 			# if action.parameters[1] == "a":
 			# 	stackability_array.append(-2)
 			# 	weight_array.append(-2)
@@ -43,19 +43,19 @@ class HeuristicGenerator():
 			stackability_array.append(stackability)
 			weight_array.append(weight)
 
-		print(stackability_array)
+		# print(stackability_array)
 		stackability_array = softmax(np.array(stackability_array))
-		print(stackability_array)
-		print(weight_array)
+		# print(stackability_array)
+		# print(weight_array)
 		weight_array = softmax(np.array(weight_array))
-		print(weight_array)
+		# print(weight_array)
 
 
 		vals = []
 		for x in range(0, len(stackability_array)):
 			vals.append((20*stackability_array[x]) + (0.1*weight_array[x]))
 
-		print(softmax(np.array(vals)))
+		# print(softmax(np.array(vals)))
 
 		return softmax(np.array(vals))
 
@@ -85,7 +85,7 @@ class HeuristicGenerator():
 		#Get their weights as well
 		heur_array = []
 
-		print(actionslist)
+		# print(actionslist)
 
 		# for action in actionslist:
 		# 	name = type(action.action).__name__
@@ -98,15 +98,16 @@ class HeuristicGenerator():
 		ret = self._normalized_stack_heuristic(actionslist)
 
 		if debug:
-			retstr = "["
-			for a in actionslist:
-				retstr += type(a.action).__name__ + str(a.parameters) + ", "
+			# retstr = "["
+			# for a in actionslist:
+			# 	retstr += type(a.action).__name__ + str(a.parameters) + ", "
 
-			retstr += "]"
-			print("Current possible actions: ")
-			print(retstr)
-			print("Probabilities of those actions: ")
-			print(str(ret) + "\n")
+			# retstr += "]"
+			# print("Current possible actions: ")
+			# print(retstr)
+			# print("Probabilities of those actions: ")
+			# print(str(ret) + "\n")
+			pass
 
 		return ret
 

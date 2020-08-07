@@ -10,6 +10,12 @@ class Domain():
 		#Stores a current state object
 		self.state = state
 
+	def checkActionExists(self, name):
+		for a in self.actions:
+			if type(a).__name__ == name:
+				return True
+		return False
+
 	def getValidActions(self, state):
 		actions = []
 
@@ -64,12 +70,6 @@ class State(ABC):
 	@abstractmethod
 	def isGoalSatisfied(self):
 		pass
-
-	# def __eq__(self, obj):
-	# 	for o in self.objects:
-	# 		if o != obj:
-	# 			return False
-	# 	return True
 
 #Abstract action class
 #This ensures that an action follows the correct function pattern
