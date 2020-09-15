@@ -1,0 +1,5 @@
+Box2D==2.3.10
+numpy==1.19.2
+pkg-resources==0.0.0
+ply==3.11
+pygame==1.9.6

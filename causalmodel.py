@@ -4,7 +4,8 @@ import numpy as np
 from abc import ABC, abstractmethod
 import sys
 sys.path.append('./pypddl_parser/pypddl_parser')
-import pypddl_parser.pypddl_parser as parser
+import pypddl_parser.pypddl_parser.pddlparser as parser
+# import pypddl_parser as p1
 from abstracttypes import SpecificAction
 
 class CausalModel():
@@ -53,7 +54,9 @@ def generateCausalModels(domain_path, domain):
 
 	models = {}
 
-	causalGraphClasses = parser.torun.run(domain_path).causals
+
+	causalGraphClasses = parser.PDDLParser.parse(domain_path).causals
+
 	for graph in causalGraphClasses:
 		currModel = CausalModel(graph.name)
 
@@ -75,17 +78,25 @@ def generateCausalModels(domain_path, domain):
 			funcstr = "vals = []\n"
 			
 			count = 0
-			for prop in node.related:
+			for prop in node.relation:
 				checkAttributeValueExists(domain, prop, graph.params, action_params)
+				#example flat_bottom
 				prop_word = str(prop).split("(")[0]
+				#example (?blockone ?blocktwo)
+				qparam = str(prop).split("(")[1].split(")")[0]
+
+				#Need to figure out which parameter for the actual action object corresponds to the qparam				
+				action_param_number = graph.params.index(qparam)
+
 
 				if prop_word == "flat_bottom":
 					prop_word = "flatness[\"bottom\"]"
 				elif prop_word == "flat_top":
 					prop_word = "flatness[\"top\"]"
 
-
-				funcstr += "\nvals.append(action.state.get(action.parameters[" + str(count) + "])." + prop_word + ")"
+				#This does label independant positoning
+				# funcstr += "\nvals.append(action.state.get(action.parameters[" + str(count) + "])." + prop_word + ")"
+				funcstr += "\nvals.append(action.state.get(action.parameters[" + str(action_param_number) + "])." + prop_word + ")"
 				count += 1
 			if node.relation_word == "and":
 				funcstr += "\nvals = all(vals)"

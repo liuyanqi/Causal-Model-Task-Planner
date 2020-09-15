@@ -1,40 +1,119 @@
-# This file is part of pypddl-PDDLParser.
+from blockworld import BlockTower
+from planner import Planner
+import functools
+import causalmodel
+from visualmodel import BlockVisualModel
+from blockworld import Goal, BlockTowerState
+from riverworld import RiverWorld
+from heuristicgenerator import HeuristicGenerator
+from visualizer import runSim
+from customerrors import SimulationOver
+from abstracttypes import SpecificAction
 
-# pypddl-parser is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
+# from pypddlparser.pddlparser import PDDLParser
+# from pypddlparser import main
+# import pypddl_parser.pypddl_parser.pddlparser
+# import pypddl_parser.pypddl_parser.main
 
-# pypddl-parser is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-
-# You should have received a copy of the GNU General Public License
-# along with pypddl-parser.  If not, see <http://www.gnu.org/licenses/>.
-
-
-import argparse
-
-from pddlparser import PDDLParser
-
-
-def parse():
-    usage = 'python3 main.py <DOMAIN>'
-    description = 'pypddl-parser is a PDDL parser built on top of ply.'
-    parser = argparse.ArgumentParser(usage=usage, description=description)
-
-    parser.add_argument('domain',  type=str, help='path to PDDL domain file')
-    # parser.add_argument('problem', type=str, help='path to PDDL problem file')
-
-    return parser.parse_args()
+def runSimulation(myplanner):
+	# temp_state = BlockTowerState()
+	# temp_state.get("a").on = "b"
+	# temp_state.get("b").on = "d"
+	# temp_state.get("d").on = "c"
+	# temp_state.total_weight = 2
 
 
-if __name__ == '__main__':
-    args = parse()
 
-    domain  = PDDLParser.parse(args.domain)
-    # problem = PDDLParser.parse(args.problem)
+	res = myplanner.plan()
+	Planner.printHistory(res)
+	try:
+		# myplanner.domain.state = temp_state
+		runSim(res, myplanner)
+	except SimulationOver as e:
+		print(type(e.message))
+		if e.message == None:
+			print("Sucess! Goal acheived")
+		else:
+			domain.state = e.message
+			runSimulation(myplanner)
+		
 
-    print(domain)
-    # print(problem)
+
+if __name__ == "__main__":
+
+	domain = BlockTower()
+	myPlan = Planner(domain)
+	causalmodel.generateCausalModels("./pypddl_parser/pypddl_parser/pddl/example_causal_model.pddl", domain)
+	# print(cm[0].runModel(SpecificAction(domain.stack, ["a", "b"], domain.state)))
+
+
+	heur = HeuristicGenerator(domain)
+	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction))
+	runSimulation(myPlan)
+
+	print(domain.causal_models)
+	
+	'''
+	Add causal models to a domain
+	For each action search through the causal models to find one who matches in name
+	If no matches, raise error
+	Or could do model completeness checking earlier
+	'''
+
+
+	# print(cm.getPredicates(SpecificAction(domain.stack, ["a", "b"], domain.state)))
+
+	'''
+	# #------Block Domain----------
+	domain = BlockTower()
+	myPlan = Planner(domain)
+
+
+	#Uncomment to run BFS
+	# viz = BlockVisualModel(domain)
+	# myPlan.setAlgo(functools.partial(myPlan.BFS, self=myPlan))
+
+	# #Uncomment to run naive Causal model w no visual model
+	# viz = BlockVisualModel(domain)
+	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=CausalModel.chooseNextAction))
+
+	# #Uncomment to run Causal model with visual model
+	# viz = BlockVisualModel(domain)
+	# viz_func = functools.partial(CausalModel.chooseNextActionVisual, viz=viz, domain=domain, debug=False)
+	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=viz_func))
+
+	# Planner.printHistory(myPlan.plan())
+	# # myPlan.collectStats(1000)
+	# print()
+	# print(viz.flatness_vals)
+
+	#------------------Entirelly new domain----------
+	viz = BlockVisualModel(domain)
+	causal = CausalModel(viz)
+	heur = HeuristicGenerator(causal)
+	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction))
+	runSimulation(myPlan)
+
+
+
+	# print(domain.state)
+	# myPlan.collectStats(1000)
+	# res = myPlan.plan()
+	# Planner.printHistory(res)
+	# simret = runSim(res, myPlan)
+	# if simret != None:
+	# 	domain.state = copy.deepcopy(simret)
+
+
+
+
+	#--------------River Domain----------------------
+	# domain = RiverWorld()
+	# planner = Planner(domain, None)
+	# planner.setAlgo(functools.partial(planner.BFS, self=planner))
+	# Planner.printHistory(planner.plan())
+	# domain.cross.doAction(domain.state, ["Boat"])
+	# domain.state.get("Boat").inside = "wolf"
+	# domain.cross.doAction(domain.state, ["Boat"])
+	# print(domain.state)
+	'''

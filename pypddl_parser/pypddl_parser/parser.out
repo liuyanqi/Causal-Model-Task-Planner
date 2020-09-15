@@ -1,0 +1,890 @@
+Created by PLY version 3.11 (http://www.dabeaz.com/ply)
+
+Unused terminals:
+
+    HYPHEN
+
+Grammar
+
+Rule 0     S' -> pddl
+Rule 1     pddl -> domain
+Rule 2     pddl -> problem
+Rule 3     domain -> LPAREN DEFINE_KEY domain_def model_def_lst RPAREN
+Rule 4     problem -> LPAREN DEFINE_KEY problem_def domain_def goal_def hint_def RPAREN
+Rule 5     domain_def -> LPAREN DOMAIN_KEY NAME RPAREN
+Rule 6     problem_def -> LPAREN PROBLEM_KEY NAME RPAREN
+Rule 7     goal_def -> LPAREN GOAL_KEY LPAREN AND_KEY ground_predicates_lst RPAREN RPAREN
+Rule 8     hint_def -> LPAREN HINT_KEY NAME RPAREN
+Rule 9     parameters_def -> PARAMETERS_KEY LPAREN variables_lst RPAREN
+Rule 10    parameters_def -> PARAMETERS_KEY LPAREN RPAREN
+Rule 11    model_def_lst -> model_def model_def_lst
+Rule 12    model_def_lst -> model_def
+Rule 13    model_def -> LPAREN MODEL_KEY NAME parameters_def causal_def_lst RPAREN
+Rule 14    causal_def_lst -> causal_def causal_def_lst
+Rule 15    causal_def_lst -> causal_def
+Rule 16    causal_def -> LPAREN CAUSAL_KEY NAME relation_def RPAREN
+Rule 17    relation_def -> RELATION_KEY LPAREN AND_KEY literals_lst RPAREN
+Rule 18    relation_def -> RELATION_KEY LPAREN OR_KEY literals_lst RPAREN
+Rule 19    relation_def -> RELATION_KEY literal
+Rule 20    literals_lst -> literal literals_lst
+Rule 21    literals_lst -> literal
+Rule 22    literal -> LPAREN NOT_KEY predicate RPAREN
+Rule 23    literal -> predicate
+Rule 24    ground_predicates_lst -> ground_predicate ground_predicates_lst
+Rule 25    ground_predicates_lst -> ground_predicate
+Rule 26    predicate -> LPAREN NAME variables_lst RPAREN
+Rule 27    predicate -> LPAREN EQUALS VARIABLE VARIABLE RPAREN
+Rule 28    predicate -> LPAREN NAME RPAREN
+Rule 29    ground_predicate -> LPAREN NAME constants_lst RPAREN
+Rule 30    ground_predicate -> LPAREN NAME RPAREN
+Rule 31    constants_lst -> constant constants_lst
+Rule 32    constants_lst -> constant
+Rule 33    variables_lst -> VARIABLE variables_lst
+Rule 34    variables_lst -> VARIABLE
+Rule 35    constant -> NAME
+
+Terminals, with rules where they appear
+
+AND_KEY              : 7 17
+CAUSAL_KEY           : 16
+DEFINE_KEY           : 3 4
+DOMAIN_KEY           : 5
+EQUALS               : 27
+GOAL_KEY             : 7
+HINT_KEY             : 8
+HYPHEN               : 
+LPAREN               : 3 4 5 6 7 7 8 9 10 13 16 17 18 22 26 27 28 29 30
+MODEL_KEY            : 13
+NAME                 : 5 6 8 13 16 26 28 29 30 35
+NOT_KEY              : 22
+OR_KEY               : 18
+PARAMETERS_KEY       : 9 10
+PROBLEM_KEY          : 6
+RELATION_KEY         : 17 18 19
+RPAREN               : 3 4 5 6 7 7 8 9 10 13 16 17 18 22 26 27 28 29 30
+VARIABLE             : 27 27 33 34
+error                : 
+
+Nonterminals, with rules where they appear
+
+causal_def           : 14 15
+causal_def_lst       : 13 14
+constant             : 31 32
+constants_lst        : 29 31
+domain               : 1
+domain_def           : 3 4
+goal_def             : 4
+ground_predicate     : 24 25
+ground_predicates_lst : 7 24
+hint_def             : 4
+literal              : 19 20 21
+literals_lst         : 17 18 20
+model_def            : 11 12
+model_def_lst        : 3 11
+parameters_def       : 13
+pddl                 : 0
+predicate            : 22 23
+problem              : 2
+problem_def          : 4
+relation_def         : 16
+variables_lst        : 9 26 33
+
+Parsing method: LALR
+
+state 0
+
+    (0) S' -> . pddl
+    (1) pddl -> . domain
+    (2) pddl -> . problem
+    (3) domain -> . LPAREN DEFINE_KEY domain_def model_def_lst RPAREN
+    (4) problem -> . LPAREN DEFINE_KEY problem_def domain_def goal_def hint_def RPAREN
+
+    LPAREN          shift and go to state 4
+
+    pddl                           shift and go to state 1
+    domain                         shift and go to state 2
+    problem                        shift and go to state 3
+
+state 1
+
+    (0) S' -> pddl .
+
+
+
+state 2
+
+    (1) pddl -> domain .
+
+    $end            reduce using rule 1 (pddl -> domain .)
+
+
+state 3
+
+    (2) pddl -> problem .
+
+    $end            reduce using rule 2 (pddl -> problem .)
+
+
+state 4
+
+    (3) domain -> LPAREN . DEFINE_KEY domain_def model_def_lst RPAREN
+    (4) problem -> LPAREN . DEFINE_KEY problem_def domain_def goal_def hint_def RPAREN
+
+    DEFINE_KEY      shift and go to state 5
+
+
+state 5
+
+    (3) domain -> LPAREN DEFINE_KEY . domain_def model_def_lst RPAREN
+    (4) problem -> LPAREN DEFINE_KEY . problem_def domain_def goal_def hint_def RPAREN
+    (5) domain_def -> . LPAREN DOMAIN_KEY NAME RPAREN
+    (6) problem_def -> . LPAREN PROBLEM_KEY NAME RPAREN
+
+    LPAREN          shift and go to state 6
+
+    domain_def                     shift and go to state 7
+    problem_def                    shift and go to state 8
+
+state 6
+
+    (5) domain_def -> LPAREN . DOMAIN_KEY NAME RPAREN
+    (6) problem_def -> LPAREN . PROBLEM_KEY NAME RPAREN
+
+    DOMAIN_KEY      shift and go to state 9
+    PROBLEM_KEY     shift and go to state 10
+
+
+state 7
+
+    (3) domain -> LPAREN DEFINE_KEY domain_def . model_def_lst RPAREN
+    (11) model_def_lst -> . model_def model_def_lst
+    (12) model_def_lst -> . model_def
+    (13) model_def -> . LPAREN MODEL_KEY NAME parameters_def causal_def_lst RPAREN
+
+    LPAREN          shift and go to state 11
+
+    model_def_lst                  shift and go to state 12
+    model_def                      shift and go to state 13
+
+state 8
+
+    (4) problem -> LPAREN DEFINE_KEY problem_def . domain_def goal_def hint_def RPAREN
+    (5) domain_def -> . LPAREN DOMAIN_KEY NAME RPAREN
+
+    LPAREN          shift and go to state 14
+
+    domain_def                     shift and go to state 15
+
+state 9
+
+    (5) domain_def -> LPAREN DOMAIN_KEY . NAME RPAREN
+
+    NAME            shift and go to state 16
+
+
+state 10
+
+    (6) problem_def -> LPAREN PROBLEM_KEY . NAME RPAREN
+
+    NAME            shift and go to state 17
+
+
+state 11
+
+    (13) model_def -> LPAREN . MODEL_KEY NAME parameters_def causal_def_lst RPAREN
+
+    MODEL_KEY       shift and go to state 18
+
+
+state 12
+
+    (3) domain -> LPAREN DEFINE_KEY domain_def model_def_lst . RPAREN
+
+    RPAREN          shift and go to state 19
+
+
+state 13
+
+    (11) model_def_lst -> model_def . model_def_lst
+    (12) model_def_lst -> model_def .
+    (11) model_def_lst -> . model_def model_def_lst
+    (12) model_def_lst -> . model_def
+    (13) model_def -> . LPAREN MODEL_KEY NAME parameters_def causal_def_lst RPAREN
+
+    RPAREN          reduce using rule 12 (model_def_lst -> model_def .)
+    LPAREN          shift and go to state 11
+
+    model_def                      shift and go to state 13
+    model_def_lst                  shift and go to state 20
+
+state 14
+
+    (5) domain_def -> LPAREN . DOMAIN_KEY NAME RPAREN
+
+    DOMAIN_KEY      shift and go to state 9
+
+
+state 15
+
+    (4) problem -> LPAREN DEFINE_KEY problem_def domain_def . goal_def hint_def RPAREN
+    (7) goal_def -> . LPAREN GOAL_KEY LPAREN AND_KEY ground_predicates_lst RPAREN RPAREN
+
+    LPAREN          shift and go to state 21
+
+    goal_def                       shift and go to state 22
+
+state 16
+
+    (5) domain_def -> LPAREN DOMAIN_KEY NAME . RPAREN
+
+    RPAREN          shift and go to state 23
+
+
+state 17
+
+    (6) problem_def -> LPAREN PROBLEM_KEY NAME . RPAREN
+
+    RPAREN          shift and go to state 24
+
+
+state 18
+
+    (13) model_def -> LPAREN MODEL_KEY . NAME parameters_def causal_def_lst RPAREN
+
+    NAME            shift and go to state 25
+
+
+state 19
+
+    (3) domain -> LPAREN DEFINE_KEY domain_def model_def_lst RPAREN .
+
+    $end            reduce using rule 3 (domain -> LPAREN DEFINE_KEY domain_def model_def_lst RPAREN .)
+
+
+state 20
+
+    (11) model_def_lst -> model_def model_def_lst .
+
+    RPAREN          reduce using rule 11 (model_def_lst -> model_def model_def_lst .)
+
+
+state 21
+
+    (7) goal_def -> LPAREN . GOAL_KEY LPAREN AND_KEY ground_predicates_lst RPAREN RPAREN
+
+    GOAL_KEY        shift and go to state 26
+
+
+state 22
+
+    (4) problem -> LPAREN DEFINE_KEY problem_def domain_def goal_def . hint_def RPAREN
+    (8) hint_def -> . LPAREN HINT_KEY NAME RPAREN
+
+    LPAREN          shift and go to state 27
+
+    hint_def                       shift and go to state 28
+
+state 23
+
+    (5) domain_def -> LPAREN DOMAIN_KEY NAME RPAREN .
+
+    LPAREN          reduce using rule 5 (domain_def -> LPAREN DOMAIN_KEY NAME RPAREN .)
+
+
+state 24
+
+    (6) problem_def -> LPAREN PROBLEM_KEY NAME RPAREN .
+
+    LPAREN          reduce using rule 6 (problem_def -> LPAREN PROBLEM_KEY NAME RPAREN .)
+
+
+state 25
+
+    (13) model_def -> LPAREN MODEL_KEY NAME . parameters_def causal_def_lst RPAREN
+    (9) parameters_def -> . PARAMETERS_KEY LPAREN variables_lst RPAREN
+    (10) parameters_def -> . PARAMETERS_KEY LPAREN RPAREN
+
+    PARAMETERS_KEY  shift and go to state 30
+
+    parameters_def                 shift and go to state 29
+
+state 26
+
+    (7) goal_def -> LPAREN GOAL_KEY . LPAREN AND_KEY ground_predicates_lst RPAREN RPAREN
+
+    LPAREN          shift and go to state 31
+
+
+state 27
+
+    (8) hint_def -> LPAREN . HINT_KEY NAME RPAREN
+
+    HINT_KEY        shift and go to state 32
+
+
+state 28
+
+    (4) problem -> LPAREN DEFINE_KEY problem_def domain_def goal_def hint_def . RPAREN
+
+    RPAREN          shift and go to state 33
+
+
+state 29
+
+    (13) model_def -> LPAREN MODEL_KEY NAME parameters_def . causal_def_lst RPAREN
+    (14) causal_def_lst -> . causal_def causal_def_lst
+    (15) causal_def_lst -> . causal_def
+    (16) causal_def -> . LPAREN CAUSAL_KEY NAME relation_def RPAREN
+
+    LPAREN          shift and go to state 34
+
+    causal_def_lst                 shift and go to state 35
+    causal_def                     shift and go to state 36
+
+state 30
+
+    (9) parameters_def -> PARAMETERS_KEY . LPAREN variables_lst RPAREN
+    (10) parameters_def -> PARAMETERS_KEY . LPAREN RPAREN
+
+    LPAREN          shift and go to state 37
+
+
+state 31
+
+    (7) goal_def -> LPAREN GOAL_KEY LPAREN . AND_KEY ground_predicates_lst RPAREN RPAREN
+
+    AND_KEY         shift and go to state 38
+
+
+state 32
+
+    (8) hint_def -> LPAREN HINT_KEY . NAME RPAREN
+
+    NAME            shift and go to state 39
+
+
+state 33
+
+    (4) problem -> LPAREN DEFINE_KEY problem_def domain_def goal_def hint_def RPAREN .
+
+    $end            reduce using rule 4 (problem -> LPAREN DEFINE_KEY problem_def domain_def goal_def hint_def RPAREN .)
+
+
+state 34
+
+    (16) causal_def -> LPAREN . CAUSAL_KEY NAME relation_def RPAREN
+
+    CAUSAL_KEY      shift and go to state 40
+
+
+state 35
+
+    (13) model_def -> LPAREN MODEL_KEY NAME parameters_def causal_def_lst . RPAREN
+
+    RPAREN          shift and go to state 41
+
+
+state 36
+
+    (14) causal_def_lst -> causal_def . causal_def_lst
+    (15) causal_def_lst -> causal_def .
+    (14) causal_def_lst -> . causal_def causal_def_lst
+    (15) causal_def_lst -> . causal_def
+    (16) causal_def -> . LPAREN CAUSAL_KEY NAME relation_def RPAREN
+
+    RPAREN          reduce using rule 15 (causal_def_lst -> causal_def .)
+    LPAREN          shift and go to state 34
+
+    causal_def                     shift and go to state 36
+    causal_def_lst                 shift and go to state 42
+
+state 37
+
+    (9) parameters_def -> PARAMETERS_KEY LPAREN . variables_lst RPAREN
+    (10) parameters_def -> PARAMETERS_KEY LPAREN . RPAREN
+    (33) variables_lst -> . VARIABLE variables_lst
+    (34) variables_lst -> . VARIABLE
+
+    RPAREN          shift and go to state 44
+    VARIABLE        shift and go to state 45
+
+    variables_lst                  shift and go to state 43
+
+state 38
+
+    (7) goal_def -> LPAREN GOAL_KEY LPAREN AND_KEY . ground_predicates_lst RPAREN RPAREN
+    (24) ground_predicates_lst -> . ground_predicate ground_predicates_lst
+    (25) ground_predicates_lst -> . ground_predicate
+    (29) ground_predicate -> . LPAREN NAME constants_lst RPAREN
+    (30) ground_predicate -> . LPAREN NAME RPAREN
+
+    LPAREN          shift and go to state 46
+
+    ground_predicates_lst          shift and go to state 47
+    ground_predicate               shift and go to state 48
+
+state 39
+
+    (8) hint_def -> LPAREN HINT_KEY NAME . RPAREN
+
+    RPAREN          shift and go to state 49
+
+
+state 40
+
+    (16) causal_def -> LPAREN CAUSAL_KEY . NAME relation_def RPAREN
+
+    NAME            shift and go to state 50
+
+
+state 41
+
+    (13) model_def -> LPAREN MODEL_KEY NAME parameters_def causal_def_lst RPAREN .
+
+    LPAREN          reduce using rule 13 (model_def -> LPAREN MODEL_KEY NAME parameters_def causal_def_lst RPAREN .)
+    RPAREN          reduce using rule 13 (model_def -> LPAREN MODEL_KEY NAME parameters_def causal_def_lst RPAREN .)
+
+
+state 42
+
+    (14) causal_def_lst -> causal_def causal_def_lst .
+
+    RPAREN          reduce using rule 14 (causal_def_lst -> causal_def causal_def_lst .)
+
+
+state 43
+
+    (9) parameters_def -> PARAMETERS_KEY LPAREN variables_lst . RPAREN
+
+    RPAREN          shift and go to state 51
+
+
+state 44
+
+    (10) parameters_def -> PARAMETERS_KEY LPAREN RPAREN .
+
+    LPAREN          reduce using rule 10 (parameters_def -> PARAMETERS_KEY LPAREN RPAREN .)
+
+
+state 45
+
+    (33) variables_lst -> VARIABLE . variables_lst
+    (34) variables_lst -> VARIABLE .
+    (33) variables_lst -> . VARIABLE variables_lst
+    (34) variables_lst -> . VARIABLE
+
+    RPAREN          reduce using rule 34 (variables_lst -> VARIABLE .)
+    VARIABLE        shift and go to state 45
+
+    variables_lst                  shift and go to state 52
+
+state 46
+
+    (29) ground_predicate -> LPAREN . NAME constants_lst RPAREN
+    (30) ground_predicate -> LPAREN . NAME RPAREN
+
+    NAME            shift and go to state 53
+
+
+state 47
+
+    (7) goal_def -> LPAREN GOAL_KEY LPAREN AND_KEY ground_predicates_lst . RPAREN RPAREN
+
+    RPAREN          shift and go to state 54
+
+
+state 48
+
+    (24) ground_predicates_lst -> ground_predicate . ground_predicates_lst
+    (25) ground_predicates_lst -> ground_predicate .
+    (24) ground_predicates_lst -> . ground_predicate ground_predicates_lst
+    (25) ground_predicates_lst -> . ground_predicate
+    (29) ground_predicate -> . LPAREN NAME constants_lst RPAREN
+    (30) ground_predicate -> . LPAREN NAME RPAREN
+
+    RPAREN          reduce using rule 25 (ground_predicates_lst -> ground_predicate .)
+    LPAREN          shift and go to state 46
+
+    ground_predicate               shift and go to state 48
+    ground_predicates_lst          shift and go to state 55
+
+state 49
+
+    (8) hint_def -> LPAREN HINT_KEY NAME RPAREN .
+
+    RPAREN          reduce using rule 8 (hint_def -> LPAREN HINT_KEY NAME RPAREN .)
+
+
+state 50
+
+    (16) causal_def -> LPAREN CAUSAL_KEY NAME . relation_def RPAREN
+    (17) relation_def -> . RELATION_KEY LPAREN AND_KEY literals_lst RPAREN
+    (18) relation_def -> . RELATION_KEY LPAREN OR_KEY literals_lst RPAREN
+    (19) relation_def -> . RELATION_KEY literal
+
+    RELATION_KEY    shift and go to state 57
+
+    relation_def                   shift and go to state 56
+
+state 51
+
+    (9) parameters_def -> PARAMETERS_KEY LPAREN variables_lst RPAREN .
+
+    LPAREN          reduce using rule 9 (parameters_def -> PARAMETERS_KEY LPAREN variables_lst RPAREN .)
+
+
+state 52
+
+    (33) variables_lst -> VARIABLE variables_lst .
+
+    RPAREN          reduce using rule 33 (variables_lst -> VARIABLE variables_lst .)
+
+
+state 53
+
+    (29) ground_predicate -> LPAREN NAME . constants_lst RPAREN
+    (30) ground_predicate -> LPAREN NAME . RPAREN
+    (31) constants_lst -> . constant constants_lst
+    (32) constants_lst -> . constant
+    (35) constant -> . NAME
+
+    RPAREN          shift and go to state 60
+    NAME            shift and go to state 58
+
+    constants_lst                  shift and go to state 59
+    constant                       shift and go to state 61
+
+state 54
+
+    (7) goal_def -> LPAREN GOAL_KEY LPAREN AND_KEY ground_predicates_lst RPAREN . RPAREN
+
+    RPAREN          shift and go to state 62
+
+
+state 55
+
+    (24) ground_predicates_lst -> ground_predicate ground_predicates_lst .
+
+    RPAREN          reduce using rule 24 (ground_predicates_lst -> ground_predicate ground_predicates_lst .)
+
+
+state 56
+
+    (16) causal_def -> LPAREN CAUSAL_KEY NAME relation_def . RPAREN
+
+    RPAREN          shift and go to state 63
+
+
+state 57
+
+    (17) relation_def -> RELATION_KEY . LPAREN AND_KEY literals_lst RPAREN
+    (18) relation_def -> RELATION_KEY . LPAREN OR_KEY literals_lst RPAREN
+    (19) relation_def -> RELATION_KEY . literal
+    (22) literal -> . LPAREN NOT_KEY predicate RPAREN
+    (23) literal -> . predicate
+    (26) predicate -> . LPAREN NAME variables_lst RPAREN
+    (27) predicate -> . LPAREN EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> . LPAREN NAME RPAREN
+
+    LPAREN          shift and go to state 64
+
+    literal                        shift and go to state 65
+    predicate                      shift and go to state 66
+
+state 58
+
+    (35) constant -> NAME .
+
+    NAME            reduce using rule 35 (constant -> NAME .)
+    RPAREN          reduce using rule 35 (constant -> NAME .)
+
+
+state 59
+
+    (29) ground_predicate -> LPAREN NAME constants_lst . RPAREN
+
+    RPAREN          shift and go to state 67
+
+
+state 60
+
+    (30) ground_predicate -> LPAREN NAME RPAREN .
+
+    LPAREN          reduce using rule 30 (ground_predicate -> LPAREN NAME RPAREN .)
+    RPAREN          reduce using rule 30 (ground_predicate -> LPAREN NAME RPAREN .)
+
+
+state 61
+
+    (31) constants_lst -> constant . constants_lst
+    (32) constants_lst -> constant .
+    (31) constants_lst -> . constant constants_lst
+    (32) constants_lst -> . constant
+    (35) constant -> . NAME
+
+    RPAREN          reduce using rule 32 (constants_lst -> constant .)
+    NAME            shift and go to state 58
+
+    constant                       shift and go to state 61
+    constants_lst                  shift and go to state 68
+
+state 62
+
+    (7) goal_def -> LPAREN GOAL_KEY LPAREN AND_KEY ground_predicates_lst RPAREN RPAREN .
+
+    LPAREN          reduce using rule 7 (goal_def -> LPAREN GOAL_KEY LPAREN AND_KEY ground_predicates_lst RPAREN RPAREN .)
+
+
+state 63
+
+    (16) causal_def -> LPAREN CAUSAL_KEY NAME relation_def RPAREN .
+
+    LPAREN          reduce using rule 16 (causal_def -> LPAREN CAUSAL_KEY NAME relation_def RPAREN .)
+    RPAREN          reduce using rule 16 (causal_def -> LPAREN CAUSAL_KEY NAME relation_def RPAREN .)
+
+
+state 64
+
+    (17) relation_def -> RELATION_KEY LPAREN . AND_KEY literals_lst RPAREN
+    (18) relation_def -> RELATION_KEY LPAREN . OR_KEY literals_lst RPAREN
+    (22) literal -> LPAREN . NOT_KEY predicate RPAREN
+    (26) predicate -> LPAREN . NAME variables_lst RPAREN
+    (27) predicate -> LPAREN . EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> LPAREN . NAME RPAREN
+
+    AND_KEY         shift and go to state 69
+    OR_KEY          shift and go to state 70
+    NOT_KEY         shift and go to state 71
+    NAME            shift and go to state 72
+    EQUALS          shift and go to state 73
+
+
+state 65
+
+    (19) relation_def -> RELATION_KEY literal .
+
+    RPAREN          reduce using rule 19 (relation_def -> RELATION_KEY literal .)
+
+
+state 66
+
+    (23) literal -> predicate .
+
+    RPAREN          reduce using rule 23 (literal -> predicate .)
+    LPAREN          reduce using rule 23 (literal -> predicate .)
+
+
+state 67
+
+    (29) ground_predicate -> LPAREN NAME constants_lst RPAREN .
+
+    LPAREN          reduce using rule 29 (ground_predicate -> LPAREN NAME constants_lst RPAREN .)
+    RPAREN          reduce using rule 29 (ground_predicate -> LPAREN NAME constants_lst RPAREN .)
+
+
+state 68
+
+    (31) constants_lst -> constant constants_lst .
+
+    RPAREN          reduce using rule 31 (constants_lst -> constant constants_lst .)
+
+
+state 69
+
+    (17) relation_def -> RELATION_KEY LPAREN AND_KEY . literals_lst RPAREN
+    (20) literals_lst -> . literal literals_lst
+    (21) literals_lst -> . literal
+    (22) literal -> . LPAREN NOT_KEY predicate RPAREN
+    (23) literal -> . predicate
+    (26) predicate -> . LPAREN NAME variables_lst RPAREN
+    (27) predicate -> . LPAREN EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> . LPAREN NAME RPAREN
+
+    LPAREN          shift and go to state 74
+
+    literals_lst                   shift and go to state 75
+    literal                        shift and go to state 76
+    predicate                      shift and go to state 66
+
+state 70
+
+    (18) relation_def -> RELATION_KEY LPAREN OR_KEY . literals_lst RPAREN
+    (20) literals_lst -> . literal literals_lst
+    (21) literals_lst -> . literal
+    (22) literal -> . LPAREN NOT_KEY predicate RPAREN
+    (23) literal -> . predicate
+    (26) predicate -> . LPAREN NAME variables_lst RPAREN
+    (27) predicate -> . LPAREN EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> . LPAREN NAME RPAREN
+
+    LPAREN          shift and go to state 74
+
+    literals_lst                   shift and go to state 77
+    literal                        shift and go to state 76
+    predicate                      shift and go to state 66
+
+state 71
+
+    (22) literal -> LPAREN NOT_KEY . predicate RPAREN
+    (26) predicate -> . LPAREN NAME variables_lst RPAREN
+    (27) predicate -> . LPAREN EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> . LPAREN NAME RPAREN
+
+    LPAREN          shift and go to state 78
+
+    predicate                      shift and go to state 79
+
+state 72
+
+    (26) predicate -> LPAREN NAME . variables_lst RPAREN
+    (28) predicate -> LPAREN NAME . RPAREN
+    (33) variables_lst -> . VARIABLE variables_lst
+    (34) variables_lst -> . VARIABLE
+
+    RPAREN          shift and go to state 81
+    VARIABLE        shift and go to state 45
+
+    variables_lst                  shift and go to state 80
+
+state 73
+
+    (27) predicate -> LPAREN EQUALS . VARIABLE VARIABLE RPAREN
+
+    VARIABLE        shift and go to state 82
+
+
+state 74
+
+    (22) literal -> LPAREN . NOT_KEY predicate RPAREN
+    (26) predicate -> LPAREN . NAME variables_lst RPAREN
+    (27) predicate -> LPAREN . EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> LPAREN . NAME RPAREN
+
+    NOT_KEY         shift and go to state 71
+    NAME            shift and go to state 72
+    EQUALS          shift and go to state 73
+
+
+state 75
+
+    (17) relation_def -> RELATION_KEY LPAREN AND_KEY literals_lst . RPAREN
+
+    RPAREN          shift and go to state 83
+
+
+state 76
+
+    (20) literals_lst -> literal . literals_lst
+    (21) literals_lst -> literal .
+    (20) literals_lst -> . literal literals_lst
+    (21) literals_lst -> . literal
+    (22) literal -> . LPAREN NOT_KEY predicate RPAREN
+    (23) literal -> . predicate
+    (26) predicate -> . LPAREN NAME variables_lst RPAREN
+    (27) predicate -> . LPAREN EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> . LPAREN NAME RPAREN
+
+    RPAREN          reduce using rule 21 (literals_lst -> literal .)
+    LPAREN          shift and go to state 74
+
+    literal                        shift and go to state 76
+    literals_lst                   shift and go to state 84
+    predicate                      shift and go to state 66
+
+state 77
+
+    (18) relation_def -> RELATION_KEY LPAREN OR_KEY literals_lst . RPAREN
+
+    RPAREN          shift and go to state 85
+
+
+state 78
+
+    (26) predicate -> LPAREN . NAME variables_lst RPAREN
+    (27) predicate -> LPAREN . EQUALS VARIABLE VARIABLE RPAREN
+    (28) predicate -> LPAREN . NAME RPAREN
+
+    NAME            shift and go to state 72
+    EQUALS          shift and go to state 73
+
+
+state 79
+
+    (22) literal -> LPAREN NOT_KEY predicate . RPAREN
+
+    RPAREN          shift and go to state 86
+
+
+state 80
+
+    (26) predicate -> LPAREN NAME variables_lst . RPAREN
+
+    RPAREN          shift and go to state 87
+
+
+state 81
+
+    (28) predicate -> LPAREN NAME RPAREN .
+
+    RPAREN          reduce using rule 28 (predicate -> LPAREN NAME RPAREN .)
+    LPAREN          reduce using rule 28 (predicate -> LPAREN NAME RPAREN .)
+
+
+state 82
+
+    (27) predicate -> LPAREN EQUALS VARIABLE . VARIABLE RPAREN
+
+    VARIABLE        shift and go to state 88
+
+
+state 83
+
+    (17) relation_def -> RELATION_KEY LPAREN AND_KEY literals_lst RPAREN .
+
+    RPAREN          reduce using rule 17 (relation_def -> RELATION_KEY LPAREN AND_KEY literals_lst RPAREN .)
+
+
+state 84
+
+    (20) literals_lst -> literal literals_lst .
+
+    RPAREN          reduce using rule 20 (literals_lst -> literal literals_lst .)
+
+
+state 85
+
+    (18) relation_def -> RELATION_KEY LPAREN OR_KEY literals_lst RPAREN .
+
+    RPAREN          reduce using rule 18 (relation_def -> RELATION_KEY LPAREN OR_KEY literals_lst RPAREN .)
+
+
+state 86
+
+    (22) literal -> LPAREN NOT_KEY predicate RPAREN .
+
+    RPAREN          reduce using rule 22 (literal -> LPAREN NOT_KEY predicate RPAREN .)
+    LPAREN          reduce using rule 22 (literal -> LPAREN NOT_KEY predicate RPAREN .)
+
+
+state 87
+
+    (26) predicate -> LPAREN NAME variables_lst RPAREN .
+
+    RPAREN          reduce using rule 26 (predicate -> LPAREN NAME variables_lst RPAREN .)
+    LPAREN          reduce using rule 26 (predicate -> LPAREN NAME variables_lst RPAREN .)
+
+
+state 88
+
+    (27) predicate -> LPAREN EQUALS VARIABLE VARIABLE . RPAREN
+
+    RPAREN          shift and go to state 89
+
+
+state 89
+
+    (27) predicate -> LPAREN EQUALS VARIABLE VARIABLE RPAREN .
+
+    RPAREN          reduce using rule 27 (predicate -> LPAREN EQUALS VARIABLE VARIABLE RPAREN .)
+    LPAREN          reduce using rule 27 (predicate -> LPAREN EQUALS VARIABLE VARIABLE RPAREN .)
+
