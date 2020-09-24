@@ -10,6 +10,8 @@ class Domain():
 		#Stores a current state object
 		self.state = state
 		self.causal_models = []
+		self.goal = None
+
 
 	def checkActionExists(self, name):
 		for a in self.actions:
@@ -45,6 +47,10 @@ class Domain():
 
 		return actions
 
+	@abstractmethod
+	def isGoalSatisfied(self, state):
+		pass
+
 # This superclass maintains a list of objects and their names in a domain state
 class State(ABC):
 	def __init__(self):
@@ -68,9 +74,7 @@ class State(ABC):
 	def get(self, name):
 		return self.obj_dict[name]
 
-	@abstractmethod
-	def isGoalSatisfied(self):
-		pass
+
 
 #Abstract action class
 #This ensures that an action follows the correct function pattern
@@ -98,7 +102,7 @@ class SpecificAction():
 		if self.action == None:
 			return "None"
 		else:
-			return str(self.action.name) + " " + str(self.parameters) #+ str(self.state) 
+			return str(self.action.name) + " " + str(self.parameters) #+ str(self.state)
 
 	def __eq__(self, obj):
 		return (self.parameters == obj.parameters and self.state == obj.state)

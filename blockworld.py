@@ -1,7 +1,8 @@
 import customerrors as err
-from abstracttypes import Action, Domain, State, getType, checkPredicateTrue, checkParams
+from abstracttypes import Action, Domain, State, getType, checkPredicateTrue, checkParams, SpecificAction
 import random
 from visualmodel import BlockVisualModel
+from copy import deepcopy
 
 class stack(Action):
 	def __init__(self, domain):
@@ -12,9 +13,12 @@ class stack(Action):
 	def checkPredicates(self, state, b1_name: str, b2_name: str):
 		b1 = state.get(b1_name)
 		b2 = state.get(b2_name)
+		specific_action = SpecificAction(self, [b1_name, b2_name], deepcopy(state))
+
+		predicates = self.domain.causal_models[type(specific_action.action).__name__].runModel(specific_action)
 
 		#top basically means clear
-		#stacked means 
+		#stacked means
 		#Yeah wait with unstack gonna need to change the predicates
 		#Stack a on b. Unstack a, now cant stack b on anything because b.stacked is true
 
@@ -29,6 +33,8 @@ class stack(Action):
 
 		checkPredicateTrue(clear, b1)
 		checkPredicateTrue(clear, b2)
+		if predicates["stackable"]==False:
+			raise err.PredicateFailed()
 
 
 		#Only one tower allowed
@@ -118,7 +124,7 @@ class unstack(Action):
 			state.no_placement_yet = True
 			state.total_weight -= b2.weight
 			state.total_height -= b2.height
-		
+
 		state.total_weight -= b1.weight
 		state.total_height -= b1.height
 
@@ -127,10 +133,11 @@ class BlockTowerState(State):
 	def __init__(self):
 		super().__init__()
 		# #Normal
-		self.addObject(Block("a", 1, 1, "triangle"))
+		self.addObject(Block("a", 3, 3, "triangle"))
 		self.addObject(Block("b", 1, 2, "square"))
-		self.addObject(Block("c", 3, 2, "square"))
-		self.addObject(Block("d", 1, 2, "square"))
+		self.addObject(Block("c", 3, 4, "square"))
+		self.addObject(Block("d", 1, 3, "square"))
+
 		BlockVisualModel().initState(self)
 
 		# T1
@@ -173,7 +180,7 @@ class BlockTowerState(State):
 	def __str__(self):
 		ret = "Weight: " + str(self.total_weight) + "\n"
 		ret  += "no place yet: " + str(self.no_placement_yet) + " \n"
-		
+
 		for x in self.objects:
 			ret += str(x)
 		return ret
@@ -188,8 +195,6 @@ class BlockTowerState(State):
 
 		return shapedict
 
-	def isGoalSatisfied(self):
-		return self.total_weight > 5
 		#T1
 		# return self.total_weight > 8
 
@@ -197,7 +202,11 @@ class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
 		self.stack = stack(self)
+		self.goal = Goal(weight=5, height=9)
+
 		# self.unstack = unstack(self)
+	def isGoalSatisfied(self, state):
+		return self.goal.isSatisfied(state)
 
 class Block():
 	def __init__(self, name, weight, height, shape, clear = True):
@@ -212,7 +221,7 @@ class Block():
 		return "(" + self.name + ") " + "Clear: " + str(self.clear) + " On: " + str(self.on) + " Weight: " + str(self.weight) + "\n"
 
 	def __eq__(self, other):
-		return (((self.on == other.on) 
+		return (((self.on == other.on)
 		and self.clear == other.clear)
 		and self.weight == other.weight)
 
@@ -226,19 +235,14 @@ class Goal():
 		h = False
 
 		if self.weight != None:
-			if state.total_weight > self.weight:
+			if state.total_weight >= self.weight:
 				w = True
 		else:
 			w = True
 
 		if self.height != None:
-			if state.total_height > self.height:
+			if state.total_height >= self.height:
 				h = True
 		else:
 			h = True
-
 		return (h and w)
-
-
-
-

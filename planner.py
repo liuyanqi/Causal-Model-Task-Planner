@@ -3,7 +3,7 @@ import customerrors
 import itertools
 from copy import deepcopy
 import random
-from causalmodel import CausalModel 
+from causalmodel import CausalModel
 from abstracttypes import SpecificAction
 import time
 import statistics
@@ -13,14 +13,14 @@ class Planner():
 	class Node():
 		def __init__(self, specifiedaction, history):
 			self.specifiedaction = specifiedaction
-			self.history = history
+			self.history = history #list of specific action
 
 		def __str__(self):
 			return "Action: " + str(self.specifiedaction) + " History: " + str(self.history)
 
 	def __init__(self, domain):
 		self.domain = domain
-	
+
 	def setAlgo(self, algo):
 		self.algo = algo
 
@@ -135,7 +135,7 @@ class Planner():
 	# 	for x in range(2, len(histarr)):
 	# 		h = histarr[x]
 	# 		stackarr.append(h.parameters[1])
-		
+
 	# 	return stackarr
 
 	def parseHistorytoList(self, histarr):
@@ -180,11 +180,15 @@ class Planner():
 		curr_node = self.Node(curr_action, [first_specified_action])
 
 		#While the current state is not the goal state
-		while not(curr_node.specifiedaction.state.isGoalSatisfied()):
+		while not(self.domain.isGoalSatisfied(curr_node.specifiedaction.state)):
 		# while not(self.goal.isSatisfied(curr_node.specifiedaction.state)):
-	
+
 			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
-			
+			#implement look-ahead step where the next action will result in a dead-end state
+
+
+			print("current state", curr_node.specifiedaction.state)
+
 			#We are at a "dead end" state
 			if len(next_actions) == 0:
 				if debug:
@@ -194,19 +198,41 @@ class Planner():
 				#find some new actions
 				curr_node.specifiedaction.state = deepcopy(curr_node.history[-2].state)
 				curr_node.specifiedaction.action = deepcopy(curr_node.history[-2].action)
+				# print("unsuccess attemp")
+				# self.printHistory(curr_node.history)
 				curr_node.history.pop()
 				#Restart and try and get new actions from beginning
 				continue
 
-			curr_node.specifiedaction = pickBestAction(next_actions)
-			
+			curr_node.specifiedaction, all_probs = pickBestAction(next_actions)
+			if debug:
+				print("picked action: ", type(curr_node.specifiedaction.action).__name__,  curr_node.specifiedaction.parameters)
+				print("show current available action prob")
+				for i in range(len(next_actions)):
+					print("potential action", type(next_actions[i].action).__name__,  next_actions[i].parameters, all_probs[i])
+
 			action = curr_node.specifiedaction
 
 			#Perform the perviously defined action
 			nodes_touched += 1
-			# print("Old state: ")
-			# print(action.state)
+
 			action.action.doAction(action.state, action.parameters)
+			#add one look-ahead step, not needed for this appplication yet:
+
+			potential_next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
+			while(len(potential_next_actions) ==0 and not self.domain.isGoalSatisfied(curr_node.specifiedaction.state)):
+				curr_node.specifiedaction.state = deepcopy(curr_node.history[-1].state)
+				curr_node.specifiedaction.action = deepcopy(curr_node.history[-1].action)
+
+				next_actions.remove(curr_node.specifiedaction)
+				curr_node.specifiedaction, _ =  pickBestAction(next_actions)
+				print("look ahead found dead-end, repick action...", type(curr_node.specifiedaction.action).__name__,  curr_node.specifiedaction.parameters)
+
+				action = curr_node.specifiedaction
+				action.action.doAction(action.state, action.parameters)
+				potential_next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
+
+
 
 			if debug:
 				# print("-> Performed action: " + str(type(action.action).__name__) + " " + str(action.parameters))
@@ -216,7 +242,7 @@ class Planner():
 
 			#Record the action and resultant state in the history
 			curr_node.history.append(deepcopy(action))
-			
+
 		time_taken = (time.time() - start_time)
 
 		if debug:
@@ -225,4 +251,3 @@ class Planner():
 			# print("--- Causal Planner took %s seconds ---" % time_taken)
 			pass
 		return [tuple(curr_node.history), nodes_touched, backtracks, time_taken]
-

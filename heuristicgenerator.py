@@ -30,34 +30,41 @@ class HeuristicGenerator():
 
 	def _normalized_stack_heuristic(self, actionslist):
 		weight_array = []
-		stackability_array = []
+		height_array = []
+		score = []
+		normalized_score = []
+		weight_sum = 0
+		height_sum = 0
+		goal_weight = self._domain.goal.weight
+		goal_height = self._domain.goal.height
+
 		for action in actionslist:
-			# print(str(type(action.action).__name__) + " " + str(action.parameters))
+
+			# print("ACTION:", str(type(action.action).__name__) + " " + str(action.parameters))
 			# if action.parameters[1] == "a":
 			# 	stackability_array.append(-2)
 			# 	weight_array.append(-2)
 			# else:
-			predicates = self._domain.causal_models[type(action.action).__name__].runModel(action)
-			stackability = predicates["stackable"]
+			# predicates = self._domain.causal_models[type(action.action).__name__].runModel(action)
+			# stackability = predicates["stackable"]
 			weight = action.state.get(action.parameters[0]).weight + action.state.get(action.parameters[1]).weight
-			stackability_array.append(stackability)
-			weight_array.append(weight)
+			height = action.state.get(action.parameters[0]).height + action.state.get(action.parameters[1]).height
 
-		# print(stackability_array)
-		stackability_array = softmax(np.array(stackability_array))
-		# print(stackability_array)
-		# print(weight_array)
-		weight_array = softmax(np.array(weight_array))
-		# print(weight_array)
+			weight_sum += weight/goal_weight
+			height_sum += height/goal_height
+			weight_array.append(weight/goal_weight)
+			height_array.append(height/goal_height)
 
+		score_sum = 0
+		for i in range(len(weight_array)):
+			score.append(weight_array[i]/weight_sum  * height_array[i]/height_sum)
+			score_sum += score[i]
+		normalized_score = [score[i] / sum(score) for i in range(len(score))]
 
-		vals = []
-		for x in range(0, len(stackability_array)):
-			vals.append((20*stackability_array[x]) + (0.1*weight_array[x]))
 
 		# print(softmax(np.array(vals)))
 
-		return softmax(np.array(vals))
+		return normalized_score
 
 
 		# print(stackability_array)
@@ -66,7 +73,7 @@ class HeuristicGenerator():
 		# print(weight_array)
 		# print(softmax(np.array(weight_array)))
 		# print(HeuristicGenerator.normalize(weight_array))
-		# return 
+		# return
 
 
 	def _unstack_heuristic(self, action):
@@ -115,7 +122,7 @@ class HeuristicGenerator():
 	def chooseNextAction(self, actionslist):
 		probs = self._getVisualProbabilities(actionslist, False)
 		x = sampleProbs(probs)
-		return actionslist[x]
+		return actionslist[x], probs
 
 
 def softmax(xs):

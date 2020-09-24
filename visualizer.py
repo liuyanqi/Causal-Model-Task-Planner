@@ -19,7 +19,7 @@ startTime = 0
 timeBetweenStacks = 3
 
 class CharacterCollision(Framework):
-    def __init__(self, plan, shape_dict, state):
+    def __init__(self, plan, state):
         super(CharacterCollision, self).__init__()
         print("Initializing simulator...")
         global startTime
@@ -31,10 +31,11 @@ class CharacterCollision(Framework):
         )
 
         self.startTime = 0
-        self.shape_dict = shape_dict
         self.plan = plan
         self.bottom_block = None
         self.state = state
+        self.obj_dict = state.obj_dict
+        self.shape_dict = state.getShapeDict()
 
         # box1 = self.world.CreateDynamicBody(
         #     position=(-3, 20),
@@ -123,7 +124,7 @@ class CharacterCollision(Framework):
         for x in range(0, len(tower)-1, 1):
             # print(str(tower[x]) + " " + str(tower[x+1]))
             self.stack(tower[x], tower[x+1], jostling=False)
-        
+
 
     #Modifies state to remove that entry
     def towerFromState(self):
@@ -142,7 +143,7 @@ class CharacterCollision(Framework):
                 tower.append(keys[0])
                 on_dict.pop(keys[0])
             else:
-                
+
                 for v in vals:
                     if v not in keys:
                         tower.append(v)
@@ -151,16 +152,24 @@ class CharacterCollision(Framework):
 
 
     def initShapesOnGround(self):
-        for block_name in self.shape_dict:
-            block_shape = self.shape_dict[block_name]
+        for block in self.state.objects:
+            block_shape = block.shape
+            block_name = block.name
 
             if block_shape == "square":
                 self.square.userData = block_name
                 self.square.position = (self.getEmptySpot(),5)
+                self.square.fixtures = b2FixtureDef(shape=b2PolygonShape(
+                box=(2, block.height)), density=100.0)
                 self.objs[block_name] = self.world.CreateBody(self.square)
             elif block_shape == "triangle":
                 self.triangle.position = (self.getEmptySpot(),10)
                 self.triangle.userData = block_name
+                self.triangle.fixtures = b2FixtureDef(
+                shape=b2PolygonShape(
+                    vertices=[(-2,0),(2,0),(0,block.height)]),
+                density=100.0
+                )
                 self.objs[block_name] = self.world.CreateBody(self.triangle)
 
     def Keyboard(self, key):
@@ -237,8 +246,8 @@ class CharacterCollision(Framework):
         return copy.copy(self.objs[name].position[0])
 
     #a and b here are the names of the blocks
-    def stack(self, b1, b2, jostling = True):
-        stack_height = 15
+    def stack(self, b1, b2, jostling = False):
+        stack_height = 30
         # #This weird hardcoded offset is so that boxes are unbalanced and don't sleep on triangles
         # if self.shape_dict[b1] == "triangle":
         #      coord = (self.getBlockXCoord(b1) + 0.2, stack_height)
@@ -294,7 +303,7 @@ class CharacterCollision(Framework):
             x.awake = True
             # print(x)
             #Used to get rid of edge case where triangle is on top of both
-            
+
             if not(x.userData == "ground") and not(x.userData == None):
                 # print("x.userdata " + str(x.userData))
                 # print(alreadyseen)
@@ -352,7 +361,7 @@ class CharacterCollision(Framework):
         super(CharacterCollision, self).Step(settings)
         global startTime, timeBetweenDrops
 
-        # if self.shouldEndSim(): 
+        # if self.shouldEndSim():
         #     raise SimulationOver(self.didTowerFall())
 
         # if self.pressed == "y":
@@ -363,40 +372,40 @@ class CharacterCollision(Framework):
         #     self.objs["a"].position = y
         #     # self.world.DestroyBody(self.objs["a"])
         #     self.pressed = None
+        if self.pressed =="y":
+            if self.didTowerFall():
+                print("Unexpected, action failed")
+                recovered_state = self.updateState()
+                print("State recovered:")
+                print(recovered_state)
+                raise SimulationOver(recovered_state)
 
-        if self.didTowerFall():
-            print("Unexpected, action failed")
-            recovered_state = self.updateState()
-            print("State recovered:")
-            print(recovered_state)
-            raise SimulationOver(recovered_state)
+            elapsed = time.time() - self.startTime
+            if elapsed > timeBetweenStacks:
+                if len(self.plan) > 0:
+                    next_action, params = self.plan.pop(0)
+                    print(str(next_action) + " " + str(params))
 
-        elapsed = time.time() - self.startTime
-        if elapsed > timeBetweenStacks:
-            if len(self.plan) > 0:
-                next_action, params = self.plan.pop(0)
-                print(str(next_action) + " " + str(params))
-
-                if next_action == "stack":
-                    #Bottom block need to know for fall detection
-                    if self.bottom_block == None:
-                        self.bottom_block = [params[0], self.stack(params[0], params[1])]
+                    if next_action == "stack":
+                        #Bottom block need to know for fall detection
+                        if self.bottom_block == None:
+                            self.bottom_block = [params[0], self.stack(params[0], params[1])]
+                        else:
+                            self.stack(params[0], params[1])
                     else:
-                        self.stack(params[0], params[1])
+                        self.unstack(params[0])
                 else:
-                    self.unstack(params[0])
-            else:
-                #If all the moves are done
-                #Think about ending the simulation
-                if self.shouldEndSim(): 
-                    print("Simulation complete")
-                    # print("Recovered state: ")
-                    # print(self.updateState())
-                    raise SimulationOver(None)
+                    #If all the moves are done
+                    #Think about ending the simulation
+                    if self.shouldEndSim():
+                        print("Simulation complete")
+                        # print("Recovered state: ")
+                        # print(self.updateState())
+                        raise SimulationOver(None)
 
 
 
-            self.startTime = time.time()
+                self.startTime = time.time()
 
             #         # if next_shape == "square":
             #         #     self.square.userData = u_data
@@ -413,15 +422,14 @@ class CharacterCollision(Framework):
 
 def runSim(res, planner):
     plan = planner.parseHistorytoList(res)
-    shape_dict = planner.domain.state.getShapeDict()
+    #shape_dict = planner.domain.state.getShapeDict()
     state = planner.domain.state
 
-   
-    c = CharacterCollision(plan, shape_dict, state)
+
+    c = CharacterCollision(plan, state)
     c.run()
     # except SimulationOver as e:
     #     if e.message:
     #         print("The tower fell over")
     #     else:
     #         print("The tower stayed up")
-

@@ -1,5 +1,5 @@
 import random
-from visualmodel import BlockVisualModel 
+from visualmodel import BlockVisualModel
 import numpy as np
 from abc import ABC, abstractmethod
 import sys
@@ -35,7 +35,7 @@ class CausalNode():
 
 	def getPredicate(self, action):
 		ns = {"ret": [], "action":action}
-		print(self._func)
+		# print(self._func)
 		exec(self._func, ns)
 		return ns["ret"]
 
@@ -64,11 +64,11 @@ def generateCausalModels(domain_path, domain):
 		if not(domain.checkActionExists(graph.name)):
 			#This causal model's name matches no actions
 			raise ValueError(str(graph.name) + " matches no actions in the given domain. Cannot generate CausalModel.")
-		
+
 		#Check the number of params matches the number of params for that action
 		action_params = eval("domain." + graph.name).param_types
 		if not(len(action_params) == len(graph.params)):
-			raise ValueError("The number of parameters for the " + str(graph.name) + " action is incorrect. Cannot generate CausalModel") 
+			raise ValueError("The number of parameters for the " + str(graph.name) + " action is incorrect. Cannot generate CausalModel")
 
 		for node in graph.nodes:
 			if node.relation_word not in valid_relation_words:
@@ -76,7 +76,7 @@ def generateCausalModels(domain_path, domain):
 
 
 			funcstr = "vals = []\n"
-			
+
 			count = 0
 			for prop in node.relation:
 				checkAttributeValueExists(domain, prop, graph.params, action_params)
@@ -85,7 +85,7 @@ def generateCausalModels(domain_path, domain):
 				#example (?blockone ?blocktwo)
 				qparam = str(prop).split("(")[1].split(")")[0]
 
-				#Need to figure out which parameter for the actual action object corresponds to the qparam				
+				#Need to figure out which parameter for the actual action object corresponds to the qparam
 				action_param_number = graph.params.index(qparam)
 
 
@@ -120,7 +120,7 @@ def generateCausalModels(domain_path, domain):
 			raise ValueError("Didn't parse a CausalModel for: " + str(act_name) + ". Cannot generate CausalModel")
 
 	return models
-			
+
 
 def checkAttributeValueExists(domain, prop, causalparams, action_params):
 	#The string ?x or ?y or whatever
@@ -144,14 +144,10 @@ def checkAttributeValueExists(domain, prop, causalparams, action_params):
 		return False
 	return True
 
-				
+
 def sampleProbs(probabilities):
 		r = random.random()
 		for x in range(len(probabilities)):
 			r = r - probabilities[x]
 			if r <= 0:
 				return x
-
-
-
-
