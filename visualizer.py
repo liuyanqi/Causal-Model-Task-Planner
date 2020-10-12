@@ -160,14 +160,14 @@ class CharacterCollision(Framework):
                 self.square.userData = block_name
                 self.square.position = (self.getEmptySpot(),5)
                 self.square.fixtures = b2FixtureDef(shape=b2PolygonShape(
-                box=(2, block.height)), density=100.0)
+                box=(block.width, block.height)), density=100.0)
                 self.objs[block_name] = self.world.CreateBody(self.square)
             elif block_shape == "triangle":
                 self.triangle.position = (self.getEmptySpot(),10)
                 self.triangle.userData = block_name
                 self.triangle.fixtures = b2FixtureDef(
                 shape=b2PolygonShape(
-                    vertices=[(-2,0),(2,0),(0,block.height)]),
+                    vertices=[(-block.width/2,0),(block.width/2,0),(0,block.height)]),
                 density=100.0
                 )
                 self.objs[block_name] = self.world.CreateBody(self.triangle)
@@ -287,6 +287,17 @@ class CharacterCollision(Framework):
         self.objs[b2].awake = True
         return coord[0]
 
+    def stack_side(self, b1, b2, jostling=False):
+        stack_height = 30
+        coord = (self.getBlockXCoord(b1)+ self.obj_dict[b1].width/2+,self.obj_dict[b2].width/2, stack_height)
+        self.intower.append(b2)
+
+        self.objs[b2].position= coord
+        self.objs[b2].awake=True
+        return coord[0]
+
+
+
     def unstack(self, block):
         self.objs[block].position = (self.getEmptySpot(), 5)
         self.objs[block].awake = True
@@ -392,6 +403,8 @@ class CharacterCollision(Framework):
                             self.bottom_block = [params[0], self.stack(params[0], params[1])]
                         else:
                             self.stack(params[0], params[1])
+                    elif next_action == "stack_side":
+                        self.stack(params[0], params[1])
                     else:
                         self.unstack(params[0])
                 else:

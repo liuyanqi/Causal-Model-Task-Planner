@@ -34,14 +34,16 @@ class stack(Action):
 		checkPredicateTrue(clear, b1)
 		checkPredicateTrue(clear, b2)
 		if predicates["stackable"]==False:
-			raise err.PredicateFailed()
+			raise err.PredicateFailed("not stackable")
+		if self.total_height[b2.tower] + b2.height > self.domain.goal.height:
+			raise err.PredicateFailed("exceed height limit")
 
 
 		#Only one tower allowed
-		if not(state.no_placement_yet):
-			#Check that b1.on != None
-			if b1.on == "floor":
-				raise err.PredicateFailed("Can only make one tower")
+		# if not(state.no_placement_yet):
+		# 	#Check that b1.on != None
+		# 	if b1.on == "floor":
+		# 		raise err.PredicateFailed("Can only make one tower")
 
 		if b1_name == b2_name:
 			raise err.PredicateFailed("Can't stack block on self")
@@ -62,7 +64,6 @@ class stack(Action):
 		# 	raise err.PredicateFailed("Not stackable enough!")
 
 
-
 	@checkParams
 	def doAction(self, state, b1_name: str, b2_name: str):
 		# self.checkPredicates(state, [b1_name, b2_name])
@@ -73,8 +74,10 @@ class stack(Action):
 		# Multi tower enabled
 		if b1.on == "floor":
 			state.total_weight += b1.weight
-			state.total_height += b1.height
+			state.total_height[b1.name] = b1.height
+			b1.on = "tower"
 			# Single tower
+			b1.tower = b1.name
 			state.no_placement_yet = False
 
 		# b1.top = False
@@ -88,8 +91,53 @@ class stack(Action):
 		b1.clear = False
 		b2.clear = True
 		b2.on = b1_name
+		b2.tower = b1.tower
 		state.total_weight += b2.weight
-		state.total_height += b2.height
+		state.total_height[b2.tower] += b2.height
+
+
+class stack_side(Action):
+	def __init__(self, domain):
+		super().__init__(domain)
+		self.param_types=["Block", "Block"]
+
+	def checkPredicates(self, state, b1_name:str, b2_name:str):
+		b1 = state.get(b1_name)
+		b2 = state.get(b2_name)
+
+		clear = (lambda x: x.clear)
+
+		checkPredicateTrue(clear, b2)
+		if (state.total_width + b2.width) > self.domian.goal.total_width:
+			raise err.PredicateFailed("Can't stack on the side exceeds constraint")
+
+
+		if b1_name == b2_name:
+			raise err.PredicateFailed("Can't stack block to the side of its self")
+
+	@checkParams
+	def doAction(self, state, b1_name: str, b2_name: str):
+		# self.checkPredicates(state, [b1_name, b2_name])
+
+		b1 = state.get(b1_name)
+		b2 = state.get(b2_name)
+
+		# Multi tower enabled
+		if b1.on == "floor":
+			state.total_weight += b1.weight
+			state.total_width += b1.width
+			state.total_height[b1.name] = b1.height
+			# Single tower
+			b1.tower = b1.name
+			b1.on = "tower"
+
+
+		b2.clear = True
+		b2.on = "tower"
+		b2.tower = b2.name
+		state.total_weight += b2.weight
+		state.total_width += b2.width
+		state.total_height[b2.tower] += b2.height
 
 class unstack(Action):
 	def __init__(self, domain):
@@ -133,10 +181,10 @@ class BlockTowerState(State):
 	def __init__(self):
 		super().__init__()
 		# #Normal
-		self.addObject(Block("a", 3, 3, "triangle"))
-		self.addObject(Block("b", 1, 2, "square"))
-		self.addObject(Block("c", 3, 4, "square"))
-		self.addObject(Block("d", 1, 3, "square"))
+		self.addObject(Block("a", weight=3, height=3, width=2, shape="triangle"))
+		self.addObject(Block("b", 1, 2, 2, "square"))
+		self.addObject(Block("c", 3, 4, 2, "square"))
+		self.addObject(Block("d", 1, 3, 2, "square"))
 
 		BlockVisualModel().initState(self)
 
@@ -160,7 +208,9 @@ class BlockTowerState(State):
 
 
 		self.total_weight = 0
-		self.total_height = 0
+		self.total_height = {}
+		self.max_height = 0
+		self.total_width = 0
 		self.no_placement_yet = True
 
 	def __eq__(self, other):
@@ -179,7 +229,8 @@ class BlockTowerState(State):
 
 	def __str__(self):
 		ret = "Weight: " + str(self.total_weight) + "\n"
-		ret  += "no place yet: " + str(self.no_placement_yet) + " \n"
+		#ret  += "no place yet: " + str(self.no_placement_yet) + " \n"
+		ret += "Height: " + str(self.total_height) +"\n"
 
 		for x in self.objects:
 			ret += str(x)
@@ -202,20 +253,23 @@ class BlockTower(Domain):
 	def __init__(self):
 		super().__init__(BlockTowerState())
 		self.stack = stack(self)
-		self.goal = Goal(weight=5, height=9)
+		self.stack_side = stack_side(self)
+		self.goal = Goal(weight=5, height=9, width=4)
 
 		# self.unstack = unstack(self)
 	def isGoalSatisfied(self, state):
 		return self.goal.isSatisfied(state)
 
 class Block():
-	def __init__(self, name, weight, height, shape, clear = True):
+	def __init__(self, name, weight, height, width, shape, clear = True):
 		self.name = name
-		self.clear = clear
+		self.clear = clear # there is no object on top
 		self.weight = weight
-		self.on = "floor"
+		self.on = "floor" # is this object on "floor" / on "tower"
 		self.height = height
+		self.width = width
 		self.shape = shape
+		self.tower = ""
 
 	def __str__(self):
 		return "(" + self.name + ") " + "Clear: " + str(self.clear) + " On: " + str(self.on) + " Weight: " + str(self.weight) + "\n"
@@ -226,9 +280,10 @@ class Block():
 		and self.weight == other.weight)
 
 class Goal():
-	def __init__(self, weight=None, height=None):
+	def __init__(self, weight=None, height=None, width=None):
 		self.weight = weight
 		self.height = height
+		self.width = width
 
 	def isSatisfied(self, state):
 		w = False
@@ -239,10 +294,25 @@ class Goal():
 				w = True
 		else:
 			w = True
+		#
+		# #find max height
+		# max_height = 0
+		# for tower, height in self.total_height.items():
+		# 	if height > max_height:
+		# 		max_height = height
+		# if self.height != None:
+		# 	if state.max_height <= self.height:
+		# 		h = True
+		# else:
+		# 	h = True
+		return w
 
-		if self.height != None:
-			if state.total_height >= self.height:
-				h = True
-		else:
-			h = True
-		return (h and w)
+class Constraint():
+	def __init__(self, height=None, width=None):
+		self.weight = weight
+		self.height = height
+	def isSatisfied(self, state):
+		w = False
+		h = False
+
+		if self.weight !=None:
