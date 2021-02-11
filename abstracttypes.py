@@ -51,7 +51,9 @@ class Domain():
 	def isGoalSatisfied(self, state):
 		pass
 
-# This superclass maintains a list of objects and their names in a domain state
+
+
+
 class State(ABC):
 	def __init__(self):
 		self.obj_dict = {}
@@ -109,7 +111,8 @@ class SpecificAction():
 
 	def __str__(self):
 		return str(self.parameters)
-
+	def __hash__(self):
+		return hash(self.action) + hash(tuple(self.parameters))
 def getType(obj):
 		return type(obj).__name__
 

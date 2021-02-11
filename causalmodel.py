@@ -35,7 +35,7 @@ class CausalNode():
 
 	def getPredicate(self, action):
 		ns = {"ret": [], "action":action}
-		# print(self._func)
+		#print("func:", self._func)
 		exec(self._func, ns)
 		return ns["ret"]
 

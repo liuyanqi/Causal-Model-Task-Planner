@@ -1,2 +1,4 @@
 *.Representation
 .DS_Store
+__pycache__/
+pypddl_parser/

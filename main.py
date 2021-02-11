@@ -1,12 +1,16 @@
 from blockworld import BlockTower
+from furniture import Furniture
 from planner import Planner
 import functools
 import causalmodel
-from visualmodel import BlockVisualModel
-from blockworld import Goal, BlockTowerState
-from riverworld import RiverWorld
+from visualmodel import FurnitureVisualModel
+#from blockworld import Goal, BlockTowerState
+#from riverworld import RiverWorld
+from furniture import Goal, FurnitureState
 from heuristicgenerator import HeuristicGenerator
-from visualizer import runSim
+from furniture_heuristic import FurnitureHeuristicGenerator
+#from visualizer import runSim
+from furniture_visualizer import runSim
 from customerrors import SimulationOver
 from abstracttypes import SpecificAction
 
@@ -36,11 +40,11 @@ def runSimulation(myplanner):
 		else:
 			domain.state = e.message
 			runSimulation(myplanner)
-		
+
 
 
 if __name__ == "__main__":
-
+	'''
 	domain = BlockTower()
 	myPlan = Planner(domain)
 	causalmodel.generateCausalModels("./pypddl_parser/pypddl_parser/pddl/example_causal_model.pddl", domain)
@@ -52,7 +56,21 @@ if __name__ == "__main__":
 	runSimulation(myPlan)
 
 	print(domain.causal_models)
-	
+	'''
+	domain = Furniture()
+	myPlan = Planner(domain)
+	#
+	#
+	#
+	heur = FurnitureHeuristicGenerator(domain)
+	# myPlan.MDP_Init()
+	# myPlan.policy_iteration()
+	# #myPlan.setAlgo(functools.partial(myPlan.BFS, self=myPlan))
+	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
+	res=myPlan.plan()
+	Planner.printHistory(res)
+	# runSimulation(myPlan)
+
 	'''
 	Add causal models to a domain
 	For each action search through the causal models to find one who matches in name

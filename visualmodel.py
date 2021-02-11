@@ -114,3 +114,29 @@ class BlockVisualModel():
 
 	# def getStackability(self, a, b):
 	# 	return (self.flatness_vals[a]["top"] + self.flatness_vals[b]["bottom"])/2
+class FurnitureVisualModel():
+
+	def initState(self, state):
+		# for bname, flatness_dict in self.flatness_vals.items():
+		# 	state.get(bname).flatness = flatness_dict
+
+		for name, object in state.obj_dict.items():
+			if object.shape =="BASE":
+				socket = {"top_width": 2, "bottom_width": 0}
+				flatness = {"bottom": 0, "top":0}
+
+			elif object.shape =="ROD":
+				socket = {"top_width": 2, "bottom_width": 2}
+				flatness = {"bottom":0, "top":1}
+			elif object.shape =="LIGHT":
+				socket = {"top_width": 0, "bottom_width": 0}
+				flatness = {"bottom": 1, "top": 0}
+			elif object.shape == "HEAD":
+				socket = {"top_width": 4, "bottom_width": 2.5}
+				flatness = {"bottom": 1, "top": 1}
+			elif object.shape == "DUMMY":
+				socket = {"top_width": 2, "bottom_width":2}
+				flatness = {"bottom": 1, "top" : 1}
+
+			state.get(name).socket = socket
+			state.get(name).flatness = flatness

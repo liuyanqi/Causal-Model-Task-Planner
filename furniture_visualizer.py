@@ -74,6 +74,14 @@ class CharacterCollision(Framework):
         #                         vertices=[(0,0),(4,0),(2,math.sqrt(12))]),
         #                     density=100.0
         #                     ))
+        self.square = b2BodyDef(position=(0,40),
+                                fixedRotation=False,
+                                allowSleep=True,
+                                type=2,
+                                fixtures=b2FixtureDef(
+                                shape=b2PolygonShape(
+                                box=(1,1)), density=100.0)
+                                )
 
         self.triangle = b2BodyDef(position=(-2.3, 40),
                             fixedRotation=False,
@@ -85,16 +93,49 @@ class CharacterCollision(Framework):
                             density=100.0
                             ))
 
-        self.square = b2BodyDef( position=(0, 40),
+        self.ball = b2BodyDef(position=(0,40),
+                            fixedRotation=False,
+                            allowSleep=True,
+                            type=2,
+                            fixtures=b2FixtureDef(
+                            shape=b2CircleShape(pos=(0,2), radius=1),
+                            density=100.0
+                            ))
+
+        self.base = b2BodyDef(position=(0,40),
+                            fixedRotation=False,
+                            allowSleep=True,
+                            type=2,
+                            fixtures=[b2FixtureDef(
+                            shape=b2PolygonShape(
+                                box=(2,1)),
+                            density=100.0
+                            ),b2FixtureDef(
+                            shape=b2PolygonShape(
+                                vertices=[(-2,1), (-1.1,1), (-1.1,2), (-2,2)]),
+                            density=100.0
+                            ), b2FixtureDef(
+                            shape=b2PolygonShape(
+                                vertices=[(1.1,1), (2,1), (2,2), (1.1,2)]),
+                            density=100.0,
+                            )
+                            ])
+        self.rod = b2BodyDef( position=(0, 40),
                             fixedRotation=False,
                             allowSleep=True,
                             type=2,
                             linearDamping=1,
                             fixtures=b2FixtureDef(shape=b2PolygonShape(
-                            box=(2, 2)), density=100.0),)
+                            box=(1, 3)), density=100.0),)
+        self.light = self.ball
 
-
-
+        self.head = b2BodyDef( position=(0, 40),
+                            fixedRotation=False,
+                            allowSleep=True,
+                            type=2,
+                            linearDamping=1,
+                            fixtures=b2FixtureDef(
+                            shape=b2PolygonShape(vertices=[(-1,0), (-2,2), (2,2), (1,0)]), density=100.0),)
         # x_coord = random.randrange(-290,-100, 1)/10
         # print(x_coord)
         # self.triangle.position = (x_coord, 0)
@@ -157,22 +198,31 @@ class CharacterCollision(Framework):
         for block in self.state.objects:
             block_shape = block.shape
             block_name = block.name
+            block_height = block.height
 
-            if block_shape == "square":
+            if block_shape == "ROD":
+                self.rod.userData = block_name
+                self.rod.position = (self.getEmptySpot(),5)
+                self.rod.fixtures = b2FixtureDef(shape=b2PolygonShape(
+                 box=(1, block_height)),density=100.0)
+                self.objs[block_name] = self.world.CreateBody(self.rod)
+            elif block_shape == "BASE":
+                self.base.position = (self.getEmptySpot(),10)
+                self.base.userData = block_name
+                self.objs[block_name] = self.world.CreateBody(self.base)
+
+            elif block_shape == "LIGHT":
+                self.light.position = (self.getEmptySpot(), 5)
+                self.light.userData = block_name
+                self.objs[block_name] = self.world.CreateBody(self.light)
+            elif block_shape == "HEAD":
+                self.head.position = (self.getEmptySpot(), 5)
+                self.head.userData = block_name
+                self.objs[block_name] = self.world.CreateBody(self.head)
+            else:
+                self.square.position = (self.getEmptySpot(), 5)
                 self.square.userData = block_name
-                self.square.position = (self.getEmptySpot(),5)
-                self.square.fixtures = b2FixtureDef(shape=b2PolygonShape(
-                box=(2, block.height)), density=100.0)
                 self.objs[block_name] = self.world.CreateBody(self.square)
-            elif block_shape == "triangle":
-                self.triangle.position = (self.getEmptySpot(),10)
-                self.triangle.userData = block_name
-                self.triangle.fixtures = b2FixtureDef(
-                shape=b2PolygonShape(
-                    vertices=[(-2,0),(2,0),(0,block.height)]),
-                density=100.0
-                )
-                self.objs[block_name] = self.world.CreateBody(self.triangle)
 
     def Keyboard(self, key):
         if key == Keys.K_s:
@@ -230,7 +280,7 @@ class CharacterCollision(Framework):
         return False
 
     def getEmptySpot(self):
-        unitWidth = 2
+        unitWidth = 4
 
         candidate = random.randrange(-25, 25, 1)
         for b in self.world.bodies:
@@ -266,20 +316,9 @@ class CharacterCollision(Framework):
         #     coord = (self.getBlockXCoord(b1), stack_height)
 
         #This weird hardcoded offset is so that boxes are unbalanced and don't sleep on triangles
-        if self.shape_dict[b1] == "triangle":
+        if self.shape_dict[b1] == "light":
              coord = (self.getBlockXCoord(b1) + 0.2, stack_height)
         #This adds nondeterminism to stacking squares together
-        elif b2 == "c" or b2 == "b":
-            if jostling:
-                if random.randint(0, 1):
-                    offset = random.randrange(20, 40, 1) / 10
-                    sign = random.choice([-1, 1])
-                    coord = (self.getBlockXCoord(b1) + (offset * sign), stack_height)
-                    print("Tower was jostled!")
-                else:
-                    coord = (self.getBlockXCoord(b1), stack_height)
-            else:
-                coord = (self.getBlockXCoord(b1), stack_height)
         else:
             coord = (self.getBlockXCoord(b1), stack_height)
 
@@ -289,15 +328,17 @@ class CharacterCollision(Framework):
         self.objs[b2].awake = True
         return coord[0]
 
-    def unstack(self, block):
-        self.objs[block].position = (self.getEmptySpot(), 5)
-        self.objs[block].awake = True
+    def insert(self,b1,b2):
+        stack_height=30
+        coord = (self.getBlockXCoord(b1), stack_height)
+        self.intower.append(b2)
+        self.objs[b2].position = coord
+        self.objs[b2].awake = True
+        return coord[0]
 
     def updateState(self):
         state = BlockTowerState()
         # print("Added: from bblock" + str(state.get(self.bottom_block[0]).weight))
-        state.total_weight += state.get(self.bottom_block[0]).weight
-        state.total_height += state.get(self.bottom_block[0]).height
         state.no_placement_yet = False
 
         alreadyseen = []
@@ -332,14 +373,14 @@ class CharacterCollision(Framework):
                                     print("Recorded " + str(below) + " on " + str(above))
                                     state.get(below).on = above
                                     state.get(above).clear = False
-                                    state.total_weight += state.get(below).weight
-                                    state.total_height += state.get(below).height
+                                    #state.total_weight += state.get(below).weight
+                                    #state.total_height += state.get(below).height
                                 else:
                                     print("Recorded " + str(above) + " on " + str(below))
                                     state.get(above).on = below
                                     state.get(below).clear = False
-                                    state.total_weight += state.get(above).weight
-                                    state.total_height += state.get(above).height
+                                    #state.total_weight += state.get(above).weight
+                                    #state.total_height += state.get(above).height
 
         #EDGE CASE CHECK
         #IF nothing is stacked at all
@@ -349,8 +390,8 @@ class CharacterCollision(Framework):
                 on_floor = False
 
         if on_floor:
-            state.total_height = 0
-            state.total_weight = 0
+            # state.total_height = 0
+            # state.total_weight = 0
             state.no_placement_yet = True
 
         return state
@@ -394,8 +435,11 @@ class CharacterCollision(Framework):
                             self.bottom_block = [params[0], self.stack(params[0], params[1])]
                         else:
                             self.stack(params[0], params[1])
-                    else:
-                        self.unstack(params[0])
+                    elif next_action == "insert":
+                        if self.bottom_block== None:
+                            self.bottom_block = [params[0], self.insert(params[0], params[1])]
+                        else:
+                            self.insert(params[0], params[1])
                 else:
                     #If all the moves are done
                     #Think about ending the simulation
