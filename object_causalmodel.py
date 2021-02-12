@@ -1,5 +1,6 @@
 import random
 from visualmodel import BlockVisualModel
+import sys
 import numpy as np
 from abc import ABC, abstractmethod
 import sys

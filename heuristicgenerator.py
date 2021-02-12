@@ -1,5 +1,5 @@
 import numpy as np
-from causalmodel import CausalModel, sampleProbs
+#from causalmodel import CausalModel, sampleProbs
 import math
 
 class HeuristicGenerator():
