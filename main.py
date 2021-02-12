@@ -13,6 +13,7 @@ from furniture_heuristic import FurnitureHeuristicGenerator
 from furniture_visualizer import runSim
 from customerrors import SimulationOver
 from abstracttypes import SpecificAction
+import os
 
 # from pypddlparser.pddlparser import PDDLParser
 # from pypddlparser import main
@@ -41,7 +42,16 @@ def runSimulation(myplanner):
 			domain.state = e.message
 			runSimulation(myplanner)
 
-
+def website_plan(furniture_path, encoding):
+	causal_path = os.path.join(furniture_path, "causal_"+encoding+".json")
+	prop_path = os.path.join(furniture_path, "object_property_"+encoding+".json")
+	domain = Furniture(causal_path, prop_path)
+	myPlan = Planner(domain)
+	heur = FurnitureHeuristicGenerator(domain)
+	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
+	res= myPlan.plan()
+	str = Planner.HistoryString(res)
+	return str;
 
 if __name__ == "__main__":
 	'''
@@ -57,18 +67,21 @@ if __name__ == "__main__":
 
 	print(domain.causal_models)
 	'''
-	domain = Furniture()
-	myPlan = Planner(domain)
-	#
-	#
-	#
-	heur = FurnitureHeuristicGenerator(domain)
-	# myPlan.MDP_Init()
-	# myPlan.policy_iteration()
-	# #myPlan.setAlgo(functools.partial(myPlan.BFS, self=myPlan))
-	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
-	res=myPlan.plan()
-	Planner.printHistory(res)
+	# domain = Furniture()
+	# myPlan = Planner(domain)
+	# #
+	# #
+	# #
+	# heur = FurnitureHeuristicGenerator(domain)
+	# # myPlan.MDP_Init()
+	# # myPlan.policy_iteration()
+	# # #myPlan.setAlgo(functools.partial(myPlan.BFS, self=myPlan))
+	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
+	# res=myPlan.plan()
+	# Planner.printHistory(res)
+	furniture_path = "causal_models"
+	encoding = "be359857c0f0d573cd22a871dee1343e8c929400a4977fc8d7ba579223cdb969"
+	website_plan(furniture_path, encoding)
 	# runSimulation(myPlan)
 
 	'''

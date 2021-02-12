@@ -206,7 +206,7 @@ class stack(Action):
 
 
 class FurnitureState(State):
-	def __init__(self):
+	def __init__(self, prop_path):
 		super().__init__()
 		# #Normal
 		# self.addObject(Block("base0", "BASE",0, ["CPS", "STABILITY"]))
@@ -216,7 +216,7 @@ class FurnitureState(State):
 		# self.addObject(Block("light", "LIGHT", 0,["PD"]))
 		# self.addObject(Block("head", "HEAD", 0, ["PROTECTION"]))
 		#self.addObject(Block("dummy", "DUMMY", 2, ["DUMMY"]))
-		self.addObjectFromfile("./causal_models/object_property_be359857c0f0d573cd22a871dee1343e8c929400a4977fc8d7ba579223cdb969.json");
+		self.addObjectFromfile(prop_path);
 
 
 		#FurnitureVisualModel().initState(self)
@@ -283,8 +283,8 @@ class FurnitureState(State):
 		# return self.total_weight > 8
 
 class Furniture(Domain):
-	def __init__(self):
-		super().__init__(FurnitureState())
+	def __init__(self, causal_path, prop_path):
+		super().__init__(FurnitureState(prop_path))
 		# self.stack = stack(self)
 		# self.insert = insert(self)
 		self.connect = connect(self)
@@ -316,7 +316,7 @@ class Furniture(Domain):
 		# self.state.causal_graph.addNode(LAMP)
 
 		self.state.causal_graph = Function_Causal_Graph()
-		self.state.causal_graph.addCausalGraphFromfile("causal_models/causal_be359857c0f0d573cd22a871dee1343e8c929400a4977fc8d7ba579223cdb969.json")
+		self.state.causal_graph.addCausalGraphFromfile(causal_path)
 		#self.goal = Goal(weight=5, height=9)
 		print(self.state.causal_graph)
 

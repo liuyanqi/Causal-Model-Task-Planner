@@ -135,6 +135,13 @@ class Planner():
 			if h.action != None:
 				print(str(type(h.action).__name__) + " " +str(h.parameters))
 
+	@staticmethod
+	def HistoryString(histarr):
+		string = ''
+		for h in histarr:
+			if h.action != None:
+				string += str(type(h.action).__name__) + " " +str(h.parameters) + "\n"
+		return string
 	# @staticmethod
 	# def getStacks(histarr):
 	# 	print(histarr)
