@@ -58,34 +58,34 @@ class Function_Causal_Node():
 		self.name = name
 		self.causal_function = None
 		self.properties = {p: 0 for p in param}
-		self.children_node = []
+		self.children_node = [] #node_name
 		self.value = 0
 		# self.latent= latent
 	def assign_causal_function(self, func):
 		self.causal_function = func
-	def run_causal_function(self, state, parameters):
-		#parameter: obj1, obj2..
-		properties = state.causal_graph.children_node[self.name].properties
-		if state.current_func == "init":
-			for param in parameters:
-				for func in state.obj_dict[param].function:
-					if properties.get(func) is not None:
-						properties[func] =1
-					else:
-						continue
-
-		else:
-			for func in state.obj_dict[parameters[1]].function:
-				if properties.get(func) is not None:
-					properties[func] +=1
-				else:
-					continue
-		#run causal function for latent casal nodes:
-		# if self.latent ==True:
-		# 	self.value = self.causal_function(properties)
-		self.value = self.causal_function(properties)
+	# def run_causal_function(self, state, parameters):
+	# 	#parameter: obj1, obj2..
+	# 	properties = state.causal_graph.children_node[self.name].properties
+	# 	if state.current_func == "init":
+	# 		for param in parameters:
+	# 			for func in state.obj_dict[param].function:
+	# 				if properties.get(func) is not None:
+	# 					properties[func] =1
+	# 				else:
+	# 					continue
+	#
+	# 	else:
+	# 		for func in state.obj_dict[parameters[1]].function:
+	# 			if properties.get(func) is not None:
+	# 				properties[func] +=1
+	# 			else:
+	# 				continue
+	# 	#run causal function for latent casal nodes:
+	# 	# if self.latent ==True:
+	# 	# 	self.value = self.causal_function(properties)
+		# self.value = self.causal_function(properties)
 		# print(self.name, self.properties, self.value, parameters)
-		return self.value
+		# return self.value
 	def get_causal_score(self, state):
 		return self.value
 
@@ -111,17 +111,16 @@ class Function_Causal_Graph():
 
 		for parent, children in causal_dict.items():
 			causal_node = Function_Causal_Node(name=parent);
-			# print("parent: ", parent)
+			print("parent: ", parent)
 			for child in children:
-				# print("child: ", child)
+				print("child: ", child)
 				if child not in self.all_node:
 					new_node = Function_Causal_Node(name=child);
 					self.addNode(new_node);
-					causal_node.children_node.append(new_node)
+					causal_node.children_node.append(child)
 				else:
-					causal_node.children_node.append(self.all_node[child])
+					causal_node.children_node.append(child)
 
-			#causal_node.assign_causal_function(causal_func)
 			self.addNode(causal_node)
 
 
@@ -130,9 +129,9 @@ class Function_Causal_Graph():
 			return root.value;
 		value = 1
 		for child in root.children_node:
-			# print("child: ", child.name, child.value)
-			value *= self.subtreeUtil(child);
-		# print(root.name, value)
+			#print("child: ", child.name, child.value)
+			value *= self.subtreeUtil(self.all_node[child]);
+		#print(root.name, value)
 		root.value = value;
 		return root.value
 
@@ -142,21 +141,20 @@ class Function_Causal_Graph():
 			for func in state.obj_dict[param].function:
 				if func in self.all_node:
 					self.all_node[func].value = 1
-		self.value = self.subtreeUtil(self.all_node["lamp"]);
+		self.value = self.subtreeUtil(self.all_node["Lamp"]);
 		# print("run model: ", self.value, action)
 		return self.value
 
 
-
-
 	def getScore(self):
 		return self.value
+
 	def __str__(self):
 		ret = ""
 		for key, nodes in self.all_node.items():
 			if len(nodes.children_node) !=0:
 				ret += nodes.name + " \t value: " + str(nodes.value) + "\n\t"
 			for cn in nodes.children_node:
-				ret+=str(cn.name)+ " : " + str(cn.value) + "\n\t"
+				ret+=str(self.all_node[cn].name)+ " : " + str(self.all_node[cn].value) + "\n\t"
 			ret +="\n"
 		return ret

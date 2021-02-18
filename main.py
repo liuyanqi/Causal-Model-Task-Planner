@@ -86,7 +86,7 @@ if __name__ == "__main__":
 	# res=myPlan.plan()
 	# Planner.printHistory(res)
 	furniture_path = "causal_models"
-	encoding = "be359857c0f0d573cd22a871dee1343e8c929400a4977fc8d7ba579223cdb969"
+	encoding = "1ae3c4a4ee9b07a277a5e28470e050a4f0e4c46c4ab09abbf9953daa074c6dd8"
 	str = website_plan(furniture_path, encoding)
 	print(str)
 	# runSimulation(myPlan)

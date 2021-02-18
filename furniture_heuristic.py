@@ -51,7 +51,6 @@ class FurnitureHeuristicGenerator():
 		for action in actionslist:
 			score = action.state.causal_graph.runModel(action.state, action)
 			causal_score_array.append(score)
-			print(action, score)
 			current_height = action.state.total_height + action.state.get(action.parameters[1]).height
 			if current_height > constraint:
 				constraint_score_array.append(1)
