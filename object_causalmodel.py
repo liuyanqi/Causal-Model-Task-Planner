@@ -101,15 +101,15 @@ class Function_Causal_Graph():
 		with open(filepath) as f:
 			data = json.load(f)
 		#swap between parent and children
-		causal_dict = {}
-		for parent, children in data.items():
-			for child in children:
-				try:
-					causal_dict[child].append(parent)
-				except KeyError:
-					causal_dict[child] = [parent]
+		# causal_dict = {}
+		# for parent, children in data.items():
+		# 	for child in children:
+		# 		try:
+		# 			causal_dict[child].append(parent)
+		# 		except KeyError:
+		# 			causal_dict[child] = [parent]
 
-		for parent, children in causal_dict.items():
+		for parent, children in data.items():
 			causal_node = Function_Causal_Node(name=parent);
 			print("parent: ", parent)
 			for child in children:
