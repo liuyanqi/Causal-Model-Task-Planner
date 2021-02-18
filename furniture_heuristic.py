@@ -24,7 +24,7 @@ class FurnitureHeuristicGenerator():
 
 	def _normalized_combine_heuristic(self, actionslist):
 
-		state = actionslist[0].state
+		#state = actionslist[0].state
 		constraint = self._domain.constraint.height
 		# current_func = state.current_func
 		# next_func = self.function_causal_graph.obj_func[current_func].next_func
@@ -49,8 +49,9 @@ class FurnitureHeuristicGenerator():
 		#
 		# normalized_score = self.normalize(weight_array)
 		for action in actionslist:
-			score = state.causal_graph.runModel(state, action)
+			score = action.state.causal_graph.runModel(action.state, action)
 			causal_score_array.append(score)
+			print(action, score)
 			current_height = action.state.total_height + action.state.get(action.parameters[1]).height
 			if current_height > constraint:
 				constraint_score_array.append(1)
@@ -121,6 +122,7 @@ class FurnitureHeuristicGenerator():
 	def chooseNextAction(self, actionslist):
 		self.actionslist = actionslist
 		probs = self._getVisualProbabilities(actionslist, False)
+
 		x = self.__pickhighest(probs)
 		self.picked_ind = x
 		return actionslist[x], probs

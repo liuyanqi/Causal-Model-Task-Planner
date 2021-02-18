@@ -81,7 +81,8 @@ if __name__ == "__main__":
 	# Planner.printHistory(res)
 	furniture_path = "causal_models"
 	encoding = "be359857c0f0d573cd22a871dee1343e8c929400a4977fc8d7ba579223cdb969"
-	website_plan(furniture_path, encoding)
+	str = website_plan(furniture_path, encoding)
+	print(str)
 	# runSimulation(myPlan)
 
 	'''

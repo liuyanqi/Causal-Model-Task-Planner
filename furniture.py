@@ -30,8 +30,9 @@ class connect(Action):
 				raise err.PredicateFailed("Can only make one tower")
 
 		if b1_name == b2_name:
-			raise err.PredicateFailed("Can't insert block on self")
-
+			raise err.PredicateFailed("Can't connect block on self")
+		if b1.connection["top"] ==False or b2.connection["bottom"] ==False:
+			raise err.PredicateFailed("Cannot connect");
 
 	@checkParams
 	def doAction(self, state, b1_name: str, b2_name: str):
@@ -219,7 +220,7 @@ class FurnitureState(State):
 		self.addObjectFromfile(prop_path);
 
 
-		#FurnitureVisualModel().initState(self)
+		FurnitureVisualModel().initState(self)
 
 		self.tower = []
 
@@ -345,6 +346,8 @@ class Block():
 	def __hash__(self):
 		return hash(self.name)
 class Goal():
+	def __init__(self):
+		self.goal = "lamp"
 	def isSatisfied(self, state):
 		#define goal reached if there is one base on ground, one rod on base and one light on rod
 

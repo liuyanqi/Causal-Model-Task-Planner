@@ -326,7 +326,8 @@ class Planner():
 			nodes_touched += 1
 
 			action.action.doAction(action.state, action.parameters)
-			print(action.state.causal_graph)
+			curr_node.specifiedaction.state.causal_graph.runModel(curr_node.specifiedaction.state, action)
+			print(curr_node.specifiedaction.state.causal_graph)
 			#add one look-ahead step, not needed for this appplication yet:
 
 			potential_next_actions = self.domain.getValidActions(action.state)

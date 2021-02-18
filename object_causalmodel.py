@@ -53,10 +53,11 @@ from abstracttypes import SpecificAction, Action
 
 
 class Function_Causal_Node():
-	def __init__(self, name, param):
+	def __init__(self, name, param=[]):
 		self.name = name
 		self.causal_function = None
 		self.properties = {p: 0 for p in param}
+		self.children_node = []
 		self.value = 0
 		# self.latent= latent
 	def assign_causal_function(self, func):
@@ -82,6 +83,7 @@ class Function_Causal_Node():
 		# if self.latent ==True:
 		# 	self.value = self.causal_function(properties)
 		self.value = self.causal_function(properties)
+		# print(self.name, self.properties, self.value, parameters)
 		return self.value
 	def get_causal_score(self, state):
 		return self.value
@@ -90,10 +92,11 @@ class Function_Causal_Node():
 class Function_Causal_Graph():
 	def __init__(self):
 		self.value = 0
-		self.children_node = {}
+		self.all_node = {}
 	def addNode(self, causal_node):
-		self.children_node[causal_node.name] = causal_node
+		self.all_node[causal_node.name] = causal_node
 	def addCausalGraphFromfile(self, filepath):
+
 		with open(filepath) as f:
 			data = json.load(f)
 		#swap between parent and children
@@ -104,31 +107,55 @@ class Function_Causal_Graph():
 					causal_dict[child].append(parent)
 				except KeyError:
 					causal_dict[child] = [parent]
-		for parent, children in causal_dict.items():
-			causal_node = Function_Causal_Node(name=parent, param=children);
-			def causal_func(property):
-				value = 1;
-				for func, val in property.items():
-					value *=val;
-				return value
 
-			causal_node.assign_causal_function(causal_func)
+		for parent, children in causal_dict.items():
+			causal_node = Function_Causal_Node(name=parent);
+			# print("parent: ", parent)
+			for child in children:
+				# print("child: ", child)
+				if child not in self.all_node:
+					new_node = Function_Causal_Node(name=child);
+					self.addNode(new_node);
+					causal_node.children_node.append(new_node)
+				else:
+					causal_node.children_node.append(self.all_node[child])
+
+			#causal_node.assign_causal_function(causal_func)
 			self.addNode(causal_node)
 
 
+	def subtreeUtil(self, root):
+		if(len(root.children_node) ==0):
+			return root.value;
+		value = 1
+		for child in root.children_node:
+			# print("child: ", child.name, child.value)
+			value *= self.subtreeUtil(child);
+		# print(root.name, value)
+		root.value = value;
+		return root.value
 
 	def runModel(self, state, action):
-		self.value = 0
-		for key, nodes in self.children_node.items():
-			self.value += nodes.run_causal_function(action.state, action.parameters)
+
+		for param in action.parameters:
+			for func in state.obj_dict[param].function:
+				if func in self.all_node:
+					self.all_node[func].value = 1
+		self.value = self.subtreeUtil(self.all_node["lamp"]);
+		# print("run model: ", self.value, action)
 		return self.value
+
+
+
+
 	def getScore(self):
 		return self.value
 	def __str__(self):
 		ret = ""
-		for key, nodes in self.children_node.items():
-			ret += nodes.name + " \t value: " + str(nodes.value) + "\n\t"
-			for key,val in nodes.properties.items():
-				ret+=str(key)+ " : " + str(val) + "\n\t"
+		for key, nodes in self.all_node.items():
+			if len(nodes.children_node) !=0:
+				ret += nodes.name + " \t value: " + str(nodes.value) + "\n\t"
+			for cn in nodes.children_node:
+				ret+=str(cn.name)+ " : " + str(cn.value) + "\n\t"
 			ret +="\n"
 		return ret

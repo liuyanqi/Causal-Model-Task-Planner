@@ -121,22 +121,28 @@ class FurnitureVisualModel():
 		# 	state.get(bname).flatness = flatness_dict
 
 		for name, object in state.obj_dict.items():
-			if object.shape =="BASE":
+			if object.shape =="base":
 				socket = {"top_width": 2, "bottom_width": 0}
 				flatness = {"bottom": 0, "top":0}
+				connection = {"top": True, "bottom": False}
 
-			elif object.shape =="ROD":
+			elif object.shape =="rod":
 				socket = {"top_width": 2, "bottom_width": 2}
 				flatness = {"bottom":0, "top":1}
-			elif object.shape =="LIGHT":
+				connection ={"top": True, "bottom": True}
+			elif object.shape =="light":
 				socket = {"top_width": 0, "bottom_width": 0}
 				flatness = {"bottom": 1, "top": 0}
-			elif object.shape == "HEAD":
+				connection = {"top": True, "bottom": True}
+			elif object.shape == "head":
 				socket = {"top_width": 4, "bottom_width": 2.5}
 				flatness = {"bottom": 1, "top": 1}
+				connection = {"top": False, "bottom": True}
 			elif object.shape == "DUMMY":
 				socket = {"top_width": 2, "bottom_width":2}
 				flatness = {"bottom": 1, "top" : 1}
+				connection ={"top": True, "bottom": True}
 
 			state.get(name).socket = socket
 			state.get(name).flatness = flatness
+			state.get(name).connection = connection
