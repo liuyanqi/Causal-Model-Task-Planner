@@ -3,7 +3,7 @@ import customerrors
 import itertools
 from copy import deepcopy
 import random
-from causalmodel import CausalModel
+#from causalmodel import CausalModel
 from abstracttypes import SpecificAction
 import time
 import statistics

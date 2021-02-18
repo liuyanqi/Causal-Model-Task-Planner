@@ -1,8 +1,14 @@
-from blockworld import BlockTower
+import sys
+import os
+dir_path = os.path.dirname(os.path.realpath(__file__))
+sys.path.insert(0, dir_path)
+print(sys.path)
+
+#from blockworld import BlockTower
 from furniture import Furniture
 from planner import Planner
 import functools
-import causalmodel
+#import causalmodel
 from visualmodel import FurnitureVisualModel
 #from blockworld import Goal, BlockTowerState
 #from riverworld import RiverWorld
@@ -10,7 +16,7 @@ from furniture import Goal, FurnitureState
 from heuristicgenerator import HeuristicGenerator
 from furniture_heuristic import FurnitureHeuristicGenerator
 #from visualizer import runSim
-from furniture_visualizer import runSim
+#from furniture_visualizer import runSim
 from customerrors import SimulationOver
 from abstracttypes import SpecificAction
 import os
