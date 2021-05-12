@@ -1,1 +1,0 @@
-{"provide connection to power source": ["Light"], "provide stability": ["Light", "Lamp structure"], "Light": ["lamp"], "provide extension": ["Lamp structure"], "provide protection": ["Lamp structure"], "Lamp structure": ["lamp"]}

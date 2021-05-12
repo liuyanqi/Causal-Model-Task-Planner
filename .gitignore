@@ -2,3 +2,6 @@
 .DS_Store
 __pycache__/
 pypddl_parser/
+causal_models/
+image*
+output*

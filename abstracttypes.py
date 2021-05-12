@@ -32,6 +32,7 @@ class Domain():
 
 			#Now we have a list of parameters that meet the specified type
 			type_valid_params = list(itertools.product(*list_to_product))
+			# print(type_valid_params)
 
 			for params in type_valid_params:
 				#Now we have to check that the type correct parameters
@@ -107,7 +108,7 @@ class SpecificAction():
 			return str(self.action.name) + " " + str(self.parameters) #+ str(self.state)
 
 	def __eq__(self, obj):
-		return (self.parameters == obj.parameters and self.state == obj.state)
+		return (self.parameters == obj.parameters )
 
 	def __str__(self):
 		return str(self.parameters)

@@ -8,6 +8,9 @@ from abstracttypes import SpecificAction
 import time
 import statistics
 import numpy as np
+import math
+from graphviz import Digraph
+
 
 
 class Planner():
@@ -32,6 +35,8 @@ class Planner():
 		return self.algo()[0]
 
 	MDP = dict() #mdp[s][a] = [prob, next_state, reward, done]
+	value_graph = Digraph(format="png")
+	policy_graph = Digraph(format="png")
 
 	def collectStats(self, num_times):
 		plans = {}
@@ -170,42 +175,59 @@ class Planner():
 
 	def MDP_Init(self):
 		queue = []
-		queue.append(self.domain.state)
+		queue.append([self.domain.state, None, None])
 		done = False
 		while(len(queue) > 0):
-			state = queue.pop(0)
+			state, prev_action, prev_score = queue.pop(0)
+			#print("state: " ,state)
+			self.value_graph.node(str(state), label=str(state) + str(prev_score))
 			self.MDP[state] = dict()
 			valid_actions = self.domain.getValidActions(state)
 			done = self.domain.isGoalSatisfied(state)
 			score = state.causal_graph.getScore()
+			# if done:
+			# 	print("done")
+			# 	print(state)
 
 			if len(valid_actions) ==0 :
 				if not done:
-					self.MDP[state][0] = [1, 0, -4, 0]
+					self.MDP[state][0] = [1, 0, -10, 0]
+					self.value_graph.node(str(state), label=str(state) + str(-10))
 				else:
-					self.MDP[state][0] = [1, 0, score, 1]
+					self.MDP[state][0] = [1, 0, 10, 1]
+					self.value_graph.node(str(state), label=str(state) + str(10))
+
 				continue
 
 			for action in valid_actions:
+				#print("valid action: ", action)
 				score = action.state.causal_graph.runModel(action.state, action)
+				done = self.domain.isGoalSatisfied(action.state)
+				#print(action, action.state.causal_graph, done)
 				action.action.doAction(action.state, action.parameters)
-				#next_valid_actions = self.domain.getValidActions(action.state)
-				self.MDP[state][action] = [1/len(valid_actions), action.state, score, False]
+				self.value_graph.edge(str(state), str(action.state))
 
-				queue.append(action.state)
+				#next_valid_actions = self.domain.getValidActions(action.state)
+				#print(len(next_valid_actions), action.state	)
+				if done:
+					score = 10
+				self.MDP[state][action] = [1, action.state, score, done ]
+				# if not (action.state in self.MDP):
+				queue.append([action.state, action, score])
+			#print("\n")
+		self.value_graph.render("image", view=True)
 
 
 		#TESTING:
-		for state, action_next_state in self.MDP.items():
-			print("--------------")
-			print("state:", state)
-			print(state.causal_graph)
+		# for state, action_next_state in self.MDP.items():
+		# 	print(state.causal_graph)
+		# 	for action, next_state in self.MDP[state].items():
+		# 		[prob, ns, reward, done] = next_state
+		# 		print(action, prob, reward, done)
 
-			for action, next_state in self.MDP[state].items():
-				[prob, ns, reward, done] = next_state
-				print(action, prob, ns, reward, done)
+
 	def policy_iteration(self):
-		v_old = dict()
+		v_old = dict() #dict[state] = value
 		discount_factor = 0.4
 		#initilize value
 		for state, _ in self.MDP.items():
@@ -213,47 +235,80 @@ class Planner():
 
 		while True:
 			delta = 0
-
 			v_new = dict()
 			for state , action_next_state in self.MDP.items():
 				v_f = 0
+				v_list = []
 				for action, next_state in self.MDP[state].items():
 					[prob, ns, reward, done] = next_state
 					if ns not in v_old.keys(): # termination state
-						v_f += prob * (reward)
+						v_f = prob * (reward)
 					else:
-						v_f += prob * (reward + discount_factor * v_old[ns])
-				delta = max(delta, abs(v_f - v_old[state]))
-				v_new[state] = v_f
+						v_f = prob * (reward + discount_factor * v_old[ns])
+					v_list.append(v_f)
+				delta = max(delta, abs(max(v_list) - v_old[state]))
+				v_new[state] = max(v_list)
 			v_old = v_new
 			if(delta < 0.2):
 				break;
 
 		#TEST:
-		for state, value in v_old.items():
-			print(state, value)
+		# for state, value in v_old.items():
+		# 	print(state, value)
 		#FIND POLICY //value iteration:
 		policy = []
 		done = False
 		current_state = self.init_state
 		while (not done):
+		#for i in range(0):
 			best_action = None
 			max_score = -100
 			next_s = None
+			score_list = []
+			next_state_list = []
+
 			for action, next_state in self.MDP[current_state].items():
-				[prob, ns, reward, done] = self.MDP[current_state][action]
+				[prob, ns, reward, done] = next_state
 				if ns not in v_old.keys():
 					continue
 				else:
 					score = prob * (reward + discount_factor * v_old[ns])
-				if(score > max_score):
-					best_action = action
-					max_score = score
-					next_s = ns
-			policy.append(best_action)
-			print(best_action)
+					score_list.append(score)
+					next_state_list.append((action, ns, done))
+					# print(action, score)
+			if len(score_list) !=0:
+				for idx, s in enumerate(score_list):
+					a, _, _ = next_state_list[idx];
+					#print(s, a)
+				picked_idx = self.sampleProbs(score_list)
+				best_action, next_s, done = next_state_list[picked_idx]
+				#print(best_action, next_s, done)
+				# print("best_action: ", best_action)
+
+			if best_action is not None:
+				policy.append(type(best_action.action).__name__ +": "+ ",".join(best_action.parameters))
+				#print(best_action)
+			if next_s == None and done !=True:
+				done = True
+				print("failed to generate a plan. The current plan is as follows: ")
 			current_state = next_s
 
+		return policy
+
+	def sampleProbs(self, score):
+
+		for idx, s in enumerate(score):
+			if s < 0:
+				score[idx] = 0;
+		#print(score)
+		cdf = np.cumsum(np.array(score))
+		cdf_norm = cdf/cdf[-1]
+		#print(cdf_norm)
+		r = random.uniform(0, 1)
+		for idx, c in enumerate(cdf_norm):
+			if c > r:
+				return idx
+		return len(score)-1;
 
 	@staticmethod
 	def Causal(self, pickBestAction, repick=None):
@@ -267,6 +322,7 @@ class Planner():
 
 		#Get valid actions copies from a domain so don't need to worry about mutation
 		valid_actions = self.domain.getValidActions(self.domain.state)
+
 				#Sanity check
 		if len(valid_actions) == 0:
 			print("ERROR: No possible actions from initial state!")
@@ -294,7 +350,6 @@ class Planner():
 			next_actions = self.domain.getValidActions(curr_node.specifiedaction.state)
 			#implement look-ahead step where the next action will result in a dead-end state
 
-
 			print("current state", curr_node.specifiedaction.state)
 			print("current causal", curr_node.specifiedaction.state.causal_graph)
 
@@ -316,9 +371,9 @@ class Planner():
 			curr_node.specifiedaction, all_probs = pickBestAction(next_actions)
 			if debug:
 				print("picked action: ", type(curr_node.specifiedaction.action).__name__,  curr_node.specifiedaction.parameters)
-				#print("show current available action prob")
-				# for i in range(len(next_actions)):
-				# 	print("potential action", type(next_actions[i].action).__name__,  next_actions[i].parameters, all_probs[i])
+				print("show current available action prob")
+				for i in range(len(next_actions)):
+					print("potential action", type(next_actions[i].action).__name__,  next_actions[i].parameters, all_probs[i])
 
 			action = curr_node.specifiedaction
 
@@ -334,23 +389,25 @@ class Planner():
 			while((len(potential_next_actions) ==0 and not self.domain.isGoalSatisfied(action.state))):
 				#curr_node.specifiedaction.state = deepcopy(curr_node.history[-1].state)
 				#curr_node.specifiedaction.action = deepcopy(curr_node.history[-1].action)
-
+				repick_indx = next_actions.index(curr_node.specifiedaction)
 				next_actions.remove(curr_node.specifiedaction)
 
 				if len(next_actions) == 0:
 					done = True
 					print("Failed generating a plan")
 					break
-				curr_node.specifiedaction =  repick()
+				curr_node.specifiedaction =  repick(picked_idx=repick_indx)
 				print("look ahead found dead-end, repick action...", type(curr_node.specifiedaction.action).__name__,  curr_node.specifiedaction.parameters)
 
 				action = curr_node.specifiedaction
 				action.action.doAction(action.state, action.parameters)
+
 				potential_next_actions = self.domain.getValidActions(action.state)
 
 
 			if done:
 				break
+
 			if debug:
 				# print("-> Performed action: " + str(type(action.action).__name__) + " " + str(action.parameters))
 				# print("New state: ")

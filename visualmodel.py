@@ -121,28 +121,53 @@ class FurnitureVisualModel():
 		# 	state.get(bname).flatness = flatness_dict
 
 		for name, object in state.obj_dict.items():
-			if object.shape =="base":
-				socket = {"top_width": 2, "bottom_width": 0}
-				flatness = {"bottom": 0, "top":0}
-				connection = {"top": True, "bottom": False}
+			socket = {"top_width": 2, "bottom_width": 0}
+			socket_name={"top": [], "bottom": []}
+			connection = "electrical"
 
+			if object.shape =="base":
+				socket = {"top_width": 3, "bottom_width": 1}
+				socket_name={"top": ["rod", "light bulb"], "bottom": ["electric cables"]}
+				connection = "electrical"
+			elif object.shape =="electric cables":
+				socket = {"top_width": 1, "bottom_width": 0}
+				socket_name={"top": ["base"], "bottom": []}
+				connection == "electrical"
 			elif object.shape =="rod":
-				socket = {"top_width": 2, "bottom_width": 2}
-				flatness = {"bottom":0, "top":1}
-				connection ={"top": True, "bottom": True}
-			elif object.shape =="light":
-				socket = {"top_width": 0, "bottom_width": 0}
-				flatness = {"bottom": 1, "top": 0}
-				connection = {"top": True, "bottom": True}
+				socket = {"top_width": 3, "bottom_width": 3}
+				socket_name={"top": ["light bulb", "rod", "base"], "bottom": ["base", "rod"]}
+				connection = "electrical"
+			elif object.shape =="light bulb":
+				socket = {"top_width": 2, "bottom_width": 3}
+				socket_name={"top": ["head"], "bottom": ["base", "rod"]}
+				connection = "electrical"
 			elif object.shape == "head":
-				socket = {"top_width": 4, "bottom_width": 2.5}
-				flatness = {"bottom": 1, "top": 1}
-				connection = {"top": False, "bottom": True}
-			elif object.shape == "DUMMY":
-				socket = {"top_width": 2, "bottom_width":2}
-				flatness = {"bottom": 1, "top" : 1}
-				connection ={"top": True, "bottom": True}
+				socket = {"top_width": 0, "bottom_width": 2}
+				socket_name={"top": [], "bottom": ["light bulb"]}
+				connection = "electrical"
+			elif object.shape =="wax":
+				socket = {"top_width": 2, "bottom_width": 0}
+				socket_name={"top": ["wick"], "bottom": []}
+				connection = "heat"
+			elif object.shape =="wick":
+				socket = {"top_width": 0, "bottom_width": 2}
+				socket_name={"top": [], "bottom": ["wax"]}
+				connection = "heat"
+			elif object.shape == "wheels":
+				socket = {"top_width": 1, "bottom_width": 0}
+				connection = {"top": "base", "bottom": "False"}
+			elif object.shape == "back frame":
+				socket = {"top_width": 0, "bottom_width": 2}
+				connection = {"top":"False", "bottom": "seat"}
+			elif object.shape =="seat":
+				socket = {"top_width": 2, "bottom_width": 3}
+				connection = {"top": "True",  "bottom": "rod"}
+			elif object.shape == "arm rest":
+				socket = {"top_width": 0, "bottom_width": 2}
+				connection = {"top": "False", "bottom": "seat"}
+			else:
+				connection ={"top": False, "bottom": False}
 
 			state.get(name).socket = socket
-			state.get(name).flatness = flatness
 			state.get(name).connection = connection
+			state.get(name).socket_name = socket_name

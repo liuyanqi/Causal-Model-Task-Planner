@@ -7,6 +7,7 @@ print(sys.path)
 #from blockworld import BlockTower
 from furniture import Furniture
 from planner import Planner
+from mcts_planner import MonteCarloSearch
 import functools
 #import causalmodel
 from visualmodel import FurnitureVisualModel
@@ -49,15 +50,22 @@ def runSimulation(myplanner):
 			runSimulation(myplanner)
 
 def website_plan(furniture_path, encoding):
-	causal_path = os.path.join(furniture_path, "causal_"+encoding+".json")
-	prop_path = os.path.join(furniture_path, "object_property_"+encoding+".json")
+	causal_path = os.path.join(furniture_path, "causal"+encoding+".json")
+	prop_path = os.path.join(furniture_path, "object_property"+encoding+".json")
 	domain = Furniture(causal_path, prop_path)
 	myPlan = Planner(domain)
-	heur = FurnitureHeuristicGenerator(domain)
-	myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
-	res= myPlan.plan()
-	str = Planner.HistoryString(res)
-	return str;
+	# heur = FurnitureHeuristicGenerator(domain)
+	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
+	# res= myPlan.plan()
+	# str = Planner.HistoryString(res)
+	# return str;
+	MCTreePlan = MonteCarloSearch(domain)
+	MCTreePlan.run_tree(domain.state)
+	# myPlan.MDP_Init()
+	# for i in range(20):
+	# 	print(myPlan.policy_iteration())
+	# return myPlan.policy_iteration()
+	# return None
 
 if __name__ == "__main__":
 	'''
@@ -85,8 +93,8 @@ if __name__ == "__main__":
 	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
 	# res=myPlan.plan()
 	# Planner.printHistory(res)
-	furniture_path = "causal_models"
-	encoding = "093cd8a1b113346551202393dd5028ef1a3059a41f8a8f922d60804f48d507cd"
+	furniture_path = "causal_models/new_test/"
+	encoding = ""
 	str = website_plan(furniture_path, encoding)
 	print(str)
 	# runSimulation(myPlan)

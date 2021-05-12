@@ -2,7 +2,6 @@ import numpy as np
 #from causalmodel import CausalModel, sampleProbs
 import math
 
-
 class FurnitureHeuristicGenerator():
 	def __init__(self, domain):
 		self._domain = domain
@@ -126,8 +125,12 @@ class FurnitureHeuristicGenerator():
 		self.picked_ind = x
 		return actionslist[x], probs
 
-	def repickNextAction(self):
-		self.current_weight_array.pop(self.picked_ind)
+	def repickNextAction(self, picked_idx=None):
+		#print(self.picked_ind)
+		if picked_idx is None:
+			self.current_weight_array.pop(self.picked_ind)
+		else:
+			self.current_weight_array.pop(picked_idx)
 		print(self.current_weight_array)
 		x = self.__pickhighest(self.current_weight_array)
 		return self.actionslist[x]
