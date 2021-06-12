@@ -71,6 +71,7 @@ def website_plan(furniture_path, encoding):
 	duration = time.time() - start_time
 	print("MDP plan time: ", duration)
 	print(plan)
+	return plan
 
 	# for i in range(20):
 	# 	print(myPlan.policy_iteration())
