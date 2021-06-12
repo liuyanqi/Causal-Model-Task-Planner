@@ -95,9 +95,10 @@ class Function_Causal_Node():
 class Function_Causal_Graph():
 	def __init__(self, goal):
 		self.value = 0
+		self.all_graph = []
 		self.all_node = {}
 		self.coef_map = collections.defaultdict(dict)
-		self.causal_graph = CausalGraph()
+		#self.causal_graph = CausalGraph()
 		self.goal_name = goal
 
 	def addNode(self, causal_node):
@@ -106,7 +107,7 @@ class Function_Causal_Graph():
 
 		with open(filepath) as f:
 			data = json.load(f)
-		self.causal_graph.show(data)
+		#self.causal_graph.show(data)
 		#swap between parent and children
 		# causal_dict = {}
 		# for parent, children in data.items():
@@ -115,23 +116,29 @@ class Function_Causal_Graph():
 		# 			causal_dict[child].append(parent)
 		# 		except KeyError:
 		# 			causal_dict[child] = [parent]
+		for graph in data:
+			causal_graph = {}
+			for parent, children in graph.items():
+				causal_node = Function_Causal_Node(name=parent);
+				print("parent: ", parent)
+				for child_pair in children:
+					print("child: ", child_pair)
+					child, coef = child_pair
+					if child not in self.all_node:
+						new_node = Function_Causal_Node(name=child);
+						self.all_node[new_node.name] = new_node
+						causal_graph[new_node.name] = new_node
 
-		for parent, children in data.items():
-			causal_node = Function_Causal_Node(name=parent);
-			print("parent: ", parent)
-			for child_pair in children:
-				print("child: ", child_pair)
-				child, coef = child_pair
-				if child not in self.all_node:
-					new_node = Function_Causal_Node(name=child);
+
 					self.coef_map[parent][child] = coef;
-					self.addNode(new_node);
 					causal_node.children_node.append(child)
-				else:
-					causal_node.children_node.append(child)
-					self.coef_map[parent][child] = coef
 
-			self.addNode(causal_node)
+
+				# self.addNode(causal_node)
+				self.all_node[causal_node.name] = causal_node
+				causal_graph[causal_node.name] = causal_node
+				self.all_graph.append(causal_graph)
+		print(self.coef_map)
 
 
 	def subtreeUtil(self, root):
@@ -169,8 +176,12 @@ class Function_Causal_Graph():
 			for func in state.obj_dict[param].function:
 				if func in self.all_node:
 					self.all_node[func].value = 1
-		self.value = self.subtreeUtil(self.all_node[self.goal_name]);
-		# print("run model: ", self.value, action)
+
+		for graph in self.all_graph:
+			value = self.subtreeUtil(graph[self.goal_name]);
+			if(value > self.value):
+				self.value = value
+		print("run model: ", self.value, action)
 		return self.value
 
 	def runModelfromState(self, state):
@@ -179,7 +190,10 @@ class Function_Causal_Graph():
 				for func in state.obj_dict[block.name].function:
 					if func in self.all_node:
 						self.all_node[func].value = 1
-		self.value = self.subtreeUtil(self.all_node[self.goal_name]);
+		for graph in self.all_graph:
+			value = self.subtreeUtil(graph[self.goal_name]);
+			if(value > self.value):
+				self.value = value;
 			# print("run model: ", self.value, action)
 		return self.value
 
@@ -189,10 +203,11 @@ class Function_Causal_Graph():
 
 	def __str__(self):
 		ret = ""
-		for key, nodes in self.all_node.items():
-			if len(nodes.children_node) !=0:
-				ret += nodes.name + " \t value: " + str(nodes.value) + "\n\t"
-			for cn in nodes.children_node:
-				ret+=str(self.all_node[cn].name)+ " : " + str(self.all_node[cn].value)  + " coef: " + str(self.coef_map[nodes.name][cn])+ "\n\t"
-			ret +="\n"
+		for graph in self.all_graph:
+			for key, nodes in graph.items():
+				if len(nodes.children_node) !=0:
+					ret += nodes.name + " \t value: " + str(nodes.value) + "\n\t"
+				for cn in nodes.children_node:
+					ret+=str(graph[cn].name)+ " : " + str(graph[cn].value)  + " coef: " + str(self.coef_map[nodes.name][cn])+ "\n\t"
+				ret +="\n"
 		return ret

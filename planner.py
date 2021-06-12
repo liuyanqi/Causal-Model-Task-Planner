@@ -179,7 +179,7 @@ class Planner():
 		done = False
 		while(len(queue) > 0):
 			state, prev_action, prev_score = queue.pop(0)
-			#print("state: " ,state)
+			# print("state: " ,state)
 			self.value_graph.node(str(state), label=str(state) + str(prev_score))
 			self.MDP[state] = dict()
 			valid_actions = self.domain.getValidActions(state)
@@ -200,7 +200,7 @@ class Planner():
 				continue
 
 			for action in valid_actions:
-				#print("valid action: ", action)
+				# print("valid action: ", action)
 				score = action.state.causal_graph.runModel(action.state, action)
 				done = self.domain.isGoalSatisfied(action.state)
 				#print(action, action.state.causal_graph, done)
@@ -215,7 +215,7 @@ class Planner():
 				# if not (action.state in self.MDP):
 				queue.append([action.state, action, score])
 			#print("\n")
-		self.value_graph.render("image", view=True)
+		#self.value_graph.render("image", view=True)
 
 
 		#TESTING:
@@ -279,7 +279,6 @@ class Planner():
 			if len(score_list) !=0:
 				for idx, s in enumerate(score_list):
 					a, _, _ = next_state_list[idx];
-					#print(s, a)
 				picked_idx = self.sampleProbs(score_list)
 				best_action, next_s, done = next_state_list[picked_idx]
 				#print(best_action, next_s, done)

@@ -9,6 +9,7 @@ import time
 import statistics
 import numpy as np
 import math
+import time
 from graphviz import Digraph
 
 class MCTreeValue():
@@ -16,13 +17,15 @@ class MCTreeValue():
         self.playout = [0,0]
         self.action_state_list = []
         self.prev_state = None
+        self.score = 0
 
 
 
 class MonteCarloSearch():
     def __init__(self, domain):
-        self.tree = dict() #[state][[play_out,visit_times], list(a',s'), prev_state]
+        self.tree = {} #[state][[play_out,visit_times], list(a',s'), prev_state]
         self.num_simulation = 20;
+        self.discount_factor = 0.5;
         self.domain = domain
         self.start_state = None
         self.action_seq = []
@@ -37,11 +40,14 @@ class MonteCarloSearch():
         return state_list[sel_idx];
 
     def expansion(self, state):
+        print("in expansion")
         valid_action_list = self.domain.getValidActions(state);
         next_action_state_list = self.tree[state].action_state_list;
         #next_action_list = [a for a, _ in next_action_state_list]
 
-        #print("in expansion: ", valid_action_list, next_action_state_list)
+        #print("in expansion: ", [str(valid_action) for valid_action in valid_action_list])
+        for valid_action in valid_action_list:
+            print("valid action: ", valid_action)
         select_action = None
         for action in valid_action_list:
             not_exist = True
@@ -63,7 +69,7 @@ class MonteCarloSearch():
 
     def simulation(self, state):
         valid_action_list = self.domain.getValidActions(state)
-        final_score = -1;
+        final_score = 0;
         if (len(valid_action_list) ==0):
             playout_score, playout_times = self.tree[state].playout
             playout_score += 0
@@ -71,19 +77,25 @@ class MonteCarloSearch():
             self.tree[state].playout = [playout_score, playout_times]
             return
 
+        iter = 0
+        simulation_action_list = []
         while(len(valid_action_list)!=0):
             random_action_index = math.floor(random.uniform(0, len(valid_action_list)))
             action = valid_action_list[random_action_index]
+            simulation_action_list.append(action)
             #score = action.state.causal_graph.runModel(action.state, action)
             action.action.doAction(action.state, action.parameters)
             score = action.state.causal_graph.runModelfromState(action.state)
+            final_score += score* (self.discount_factor ** iter);
+            #print(final_score)
             valid_action_list = self.domain.getValidActions(action.state)
             if(len(valid_action_list) ==0):
-                print(action.state, score)
-                final_score = score
+                print(action.state, final_score)
                 break;
+            iter +=1
+
         #update playout score
-        assert(final_score != -1)
+        #assert(final_score != -1)
         playout_score, playout_times = self.tree[state].playout
         playout_score += final_score
         playout_times += 1
@@ -105,6 +117,8 @@ class MonteCarloSearch():
     def run_tree(self, state):
         self.tree[state] = MCTreeValue();
         self.start_state = state
+        step = 0
+        plan = []
         while(not self.domain.isGoalSatisfied(state)):
             for i in range(0, self.num_simulation):
                 next_state = self.expansion(state)
@@ -118,16 +132,37 @@ class MonteCarloSearch():
                     if (len(state_list)==0):
                         continue
                     next_state = self.selection(state_list)
-                    print("selection: ", next_state)
+                    #print("selection: ", next_state)
                     state = next_state
             #decide which action to take from start_state
             final_score_list = []
+            #visualize tree:
+
+            #self.tree_visualizer(self.tree, "mcts_step_"+str(step))
             for action, next_state in self.tree[self.start_state].action_state_list:
                 final_score_list.append(self.tree[next_state].playout[1])
             print("final_score_list", final_score_list)
             picked_idx = np.argmax(np.array(final_score_list))
             print("picked action: ", self.tree[self.start_state].action_state_list[picked_idx][0])
+            plan.append(str(self.tree[self.start_state].action_state_list[picked_idx][0]));
             state = self.tree[self.start_state].action_state_list[picked_idx][1]
             self.start_state = state
             self.tree = dict()
             self.tree[self.start_state] = MCTreeValue()
+            step +=1
+        return plan
+
+    def tree_visualizer(self, tree, file_name):
+        dot = Digraph(format="png")
+
+        for s, value in self.tree.items():
+            #print("here: " ,s, value)
+            state_name = str(s)
+            #print(state_name)
+            dot.node(state_name, label=state_name)
+            for action, next_state in value.action_state_list:
+                #print("action: ", action, next_state)
+                next_state_name = str(next_state)
+                dot.node(next_state_name, label=next_state_name)
+                dot.edge(state_name, next_state_name)
+        dot.render(file_name, view=True)

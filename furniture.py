@@ -240,27 +240,23 @@ class FurnitureState(State):
 	def __init__(self, prop_path):
 		super().__init__()
 		# #Normal
-		# self.addObject(Block("base0", "BASE",0, ["CPS", "STABILITY"]))
-		# self.addObject(Block("rod0", "ROD", 2, ["EXTENSION"]))
-		# #self.addObject(Block("rod1",  "ROD", 3, ["EXTENSION"]))
-		# #self.addObject((Block("rod2", "ROD", 4, ["EXTENSION"])))
-		# self.addObject(Block("light", "LIGHT", 0,["PD"]))
-		# self.addObject(Block("head", "HEAD", 0, ["PROTECTION"]))
-		#self.addObject(Block("dummy", "DUMMY", 2, ["DUMMY"]))
 		self.all_object = {}
+		self.addObjectwithName("wax");
+		self.addObjectwithName("wick");
+		self.addObjectwithName("fuel tank");
+		self.addObjectwithName("burner");
+		self.addObjectwithName("chimney");
+		self.addObjectwithName("light cap");
+		self.addObjectwithName("battery");
+		self.addObjectwithName("case");
+		self.addObjectwithName("base with cables");
+		self.addObjectwithName("rod");
+		self.addObjectwithName("light bulb");
+		self.addObjectwithName("head");
+
 		self.addObjectFromfile(prop_path);
-		self.addObjectwithName(self.all_object["electric cables"], "cable_0")
-		self.addObjectwithName(self.all_object["base"], "base_0")
-		self.addObjectwithName(self.all_object["base"], "base_1")
-		self.addObjectwithName(self.all_object["rod"], "rod_0")
-		self.addObjectwithName(self.all_object["rod"], "rod_1")
-		# self.addObjectwithName(self.all_object["rod"], "rod_2")
-		self.addObjectwithName(self.all_object["head"], "head_0")
-		self.addObjectwithName(self.all_object["light bulb"], "light_bulb_0")
-		# self.addObjectwithName(self.all_object["light bulb"], "light_bulb_1")
+
 		print(self.obj_dict)
-
-
 
 		FurnitureVisualModel().initState(self)
 
@@ -284,15 +280,13 @@ class FurnitureState(State):
 			except KeyError as e:
 				obj_prop_dict[obj_name] = [obj_prop];
 		for obj_name, obj_prop_list in obj_prop_dict.items():
-			if obj_name =="seat":
-				block = Block(obj_name, shape=obj_name, func=obj_prop_list, clear=[True, True])
-			else:
-				block = Block(obj_name, shape=obj_name, func=obj_prop_list, clear=[True]);
+			block = Block(obj_name, shape=obj_name, func=obj_prop_list, clear=[True]);
 			self.all_object[obj_name] = block
-			print(block)
+			self.addObject(block)
 
-	def addObjectwithName(self, block, name):
-		block = Block(name, shape=block.shape, func=block.function, clear=[True])
+
+	def addObjectwithName(self, name):
+		block = Block(name, shape=name, func=[], clear=[True])
 		self.addObject(block)
 
 
@@ -373,7 +367,7 @@ class Furniture(Domain):
 		# self.state.causal_graph = Function_Causal_Graph()
 		# self.state.causal_graph.addNode(LAMP)
 
-		self.state.causal_graph = Function_Causal_Graph("Directed light")
+		self.state.causal_graph = Function_Causal_Graph("Light")
 		self.state.causal_graph.addCausalGraphFromfile(causal_path)
 
 		#connect cables to base by default
@@ -428,7 +422,7 @@ class Block():
 		self.tower_name  = "floor"
 
 	def __str__(self):
-		return "(" + self.name + ") " + "Clear: " + str(self.clear) + " On: " + str(self.on) + " Shape: " + str(self.shape) + "\n"
+		return "(" + self.name + ") " + "Clear: " + str(self.clear) + " On: " + str(self.on) + " Function: " + str(self.function) + "\n"
 
 	def __eq__(self, other):
 		return (((self.on == other.on)

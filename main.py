@@ -21,6 +21,7 @@ from furniture_heuristic import FurnitureHeuristicGenerator
 from customerrors import SimulationOver
 from abstracttypes import SpecificAction
 import os
+import time
 
 # from pypddlparser.pddlparser import PDDLParser
 # from pypddlparser import main
@@ -50,8 +51,8 @@ def runSimulation(myplanner):
 			runSimulation(myplanner)
 
 def website_plan(furniture_path, encoding):
-	causal_path = os.path.join(furniture_path, "causal"+encoding+".json")
-	prop_path = os.path.join(furniture_path, "object_property"+encoding+".json")
+	causal_path = os.path.join(furniture_path, "causal_"+encoding+".json")
+	prop_path = os.path.join(furniture_path, "object_property_"+encoding+".json")
 	domain = Furniture(causal_path, prop_path)
 	myPlan = Planner(domain)
 	# heur = FurnitureHeuristicGenerator(domain)
@@ -59,9 +60,18 @@ def website_plan(furniture_path, encoding):
 	# res= myPlan.plan()
 	# str = Planner.HistoryString(res)
 	# return str;
-	MCTreePlan = MonteCarloSearch(domain)
-	MCTreePlan.run_tree(domain.state)
-	# myPlan.MDP_Init()
+	# MCTreePlan = MonteCarloSearch(domain)
+	# start_time = time.time()
+	# plan = MCTreePlan.run_tree(domain.state)
+	# duration = time.time() - start_time
+	# print("mcts one plan time", duration)
+	myPlan.MDP_Init()
+	start_time = time.time()
+	plan = myPlan.policy_iteration()
+	duration = time.time() - start_time
+	print("MDP plan time: ", duration)
+	print(plan)
+
 	# for i in range(20):
 	# 	print(myPlan.policy_iteration())
 	# return myPlan.policy_iteration()
@@ -93,8 +103,8 @@ if __name__ == "__main__":
 	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
 	# res=myPlan.plan()
 	# Planner.printHistory(res)
-	furniture_path = "causal_models/new_test/"
-	encoding = ""
+	furniture_path = "causal_models/new_new_causal"
+	encoding = "b939e047e252e9d98d66ba9dbde235d5c034e55d8a08e73c62a5dce51661ac98"
 	str = website_plan(furniture_path, encoding)
 	print(str)
 	# runSimulation(myPlan)

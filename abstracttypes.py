@@ -69,10 +69,15 @@ class State(ABC):
 		obj_type = type(obj).__name__
 
 		try:
-			self.obj_types[obj_type].append(obj.name)
+			exist = False
+			for name in self.obj_types[obj_type]:
+				if obj.name == name:
+					exist = True;
+			if not exist:
+				self.obj_types[obj_type].append(obj.name)
 		except KeyError as e:
-			#We have no record of that type yet
 			self.obj_types[obj_type] = [obj.name]
+		# self.obj_types[obj_type] = [obj.name]
 
 	def get(self, name):
 		return self.obj_dict[name]
