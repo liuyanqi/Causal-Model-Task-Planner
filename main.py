@@ -104,8 +104,8 @@ if __name__ == "__main__":
 	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))
 	# res=myPlan.plan()
 	# Planner.printHistory(res)
-	furniture_path = "causal_models/new_new_causal"
-	encoding = "b939e047e252e9d98d66ba9dbde235d5c034e55d8a08e73c62a5dce51661ac98"
+	furniture_path = "../static/causal_graph/"
+	encoding = "5be7e1da389ee0de2c9a6ae6d734256afb7c2d8a23288213d1b1d84c97ebab4f"
 	str = website_plan(furniture_path, encoding)
 	print(str)
 	# runSimulation(myPlan)
