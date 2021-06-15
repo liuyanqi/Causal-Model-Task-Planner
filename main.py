@@ -67,11 +67,18 @@ def website_plan(furniture_path, encoding):
 	# print("mcts one plan time", duration)
 	myPlan.MDP_Init()
 	start_time = time.time()
-	plan = myPlan.policy_iteration()
+	all_plan = {}
+	for i in range(20):
+		plan = myPlan.policy_iteration()
+		if str(plan) not in all_plan:
+			all_plan[str(plan)] = True
+
 	duration = time.time() - start_time
 	print("MDP plan time: ", duration)
-	print(plan)
-	return plan
+	plan_str = []
+	for plan, _ in all_plan.items():
+		plan_str.append(str(plan))
+	return plan_str
 
 	# for i in range(20):
 	# 	print(myPlan.policy_iteration())
@@ -105,7 +112,7 @@ if __name__ == "__main__":
 	# res=myPlan.plan()
 	# Planner.printHistory(res)
 	furniture_path = "../static/causal_graph/"
-	encoding = "5be7e1da389ee0de2c9a6ae6d734256afb7c2d8a23288213d1b1d84c97ebab4f"
+	encoding = "8c8b786575bd29608d8d2ff360c2d8aac9ae0f27e21cc8d31f80efa812184c76"
 	str = website_plan(furniture_path, encoding)
 	print(str)
 	# runSimulation(myPlan)
