@@ -50,10 +50,10 @@ def runSimulation(myplanner):
 			domain.state = e.message
 			runSimulation(myplanner)
 
-def website_plan(furniture_path, encoding):
-	causal_path = os.path.join(furniture_path, "causal_"+encoding+".json")
+def website_plan( furniture_path, causal_path, encoding, plan_object):
+	causal_path = os.path.join(causal_path, "causal_"+encoding+".json")
 	prop_path = os.path.join(furniture_path, "object_property_"+encoding+".json")
-	domain = Furniture(causal_path, prop_path)
+	domain = Furniture(causal_path, prop_path, plan_object)
 	myPlan = Planner(domain)
 	# heur = FurnitureHeuristicGenerator(domain)
 	# myPlan.setAlgo(functools.partial(myPlan.Causal, self=myPlan, pickBestAction=heur.chooseNextAction, repick=heur.repickNextAction))

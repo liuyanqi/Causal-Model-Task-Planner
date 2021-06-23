@@ -237,22 +237,31 @@ class stack(Action):
 
 
 class FurnitureState(State):
-	def __init__(self, prop_path):
+	def __init__(self, prop_path, plan_object=None):
 		super().__init__()
 		# #Normal
 		self.all_object = {}
-		self.addObjectwithName("wax");
-		self.addObjectwithName("wick");
-		self.addObjectwithName("fuel tank");
-		self.addObjectwithName("burner");
-		self.addObjectwithName("chimney");
-		self.addObjectwithName("light cap");
-		self.addObjectwithName("battery");
-		self.addObjectwithName("case");
-		self.addObjectwithName("base with cables");
-		self.addObjectwithName("rod");
-		self.addObjectwithName("light bulb");
-		self.addObjectwithName("head");
+		if plan_object=="kerosene_lamp":
+			self.addObjectwithName("fuel tank");
+			self.addObjectwithName("burner");
+			self.addObjectwithName("chimney");
+		if plan_object == "flashlight":
+			self.addObjectwithName("light cap");
+			self.addObjectwithName("battery");
+			self.addObjectwithName("case");
+		else:
+			self.addObjectwithName("wax");
+			self.addObjectwithName("wick");
+			self.addObjectwithName("fuel tank");
+			self.addObjectwithName("burner");
+			self.addObjectwithName("chimney");
+			self.addObjectwithName("light cap");
+			self.addObjectwithName("battery");
+			self.addObjectwithName("case");
+			self.addObjectwithName("base with cables");
+			self.addObjectwithName("rod");
+			self.addObjectwithName("light bulb");
+			self.addObjectwithName("head");
 
 		self.addObjectFromfile(prop_path);
 
@@ -334,8 +343,8 @@ class FurnitureState(State):
 		# return self.total_weight > 8
 
 class Furniture(Domain):
-	def __init__(self, causal_path, prop_path):
-		super().__init__(FurnitureState(prop_path))
+	def __init__(self, causal_path, prop_path, plan_object=None):
+		super().__init__(FurnitureState(prop_path, plan_object))
 		# self.stack = stack(self)
 		# self.insert = insert(self)
 		self.connect = connect(self)
