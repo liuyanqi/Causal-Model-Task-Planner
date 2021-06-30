@@ -249,6 +249,14 @@ class FurnitureState(State):
 			self.addObjectwithName("light cap");
 			self.addObjectwithName("battery");
 			self.addObjectwithName("case");
+		if plan_object =="candle":
+			self.addObjectwithName("wax");
+			self.addObjectwithName("wick");
+		if plan_object =="lamp":
+			self.addObjectwithName("base with cables");
+			self.addObjectwithName("rod");
+			self.addObjectwithName("light bulb");
+			self.addObjectwithName("head");
 		else:
 			self.addObjectwithName("wax");
 			self.addObjectwithName("wick");
