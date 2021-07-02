@@ -139,8 +139,8 @@ class FurnitureVisualModel():
 				socket_name={"top": ["light bulb", "rod", "base"], "bottom": ["base", "rod", "base with cables"]}
 			elif object.shape =="light bulb":
 				socket = {"top_width": 2, "bottom_width": 3}
-				socket_name={"top": ["head"], "bottom": ["base", "rod", "base with cables"]}
-			elif object.shape == "head":
+				socket_name={"top": ["shade"], "bottom": ["base", "rod", "base with cables"]}
+			elif object.shape == "shade":
 				socket = {"top_width": 0, "bottom_width": 2}
 				socket_name={"top": [], "bottom": ["light bulb"]}
 			elif object.shape =="wax":
@@ -158,15 +158,18 @@ class FurnitureVisualModel():
 			elif object.shape =="chimney":
 				socket = {"top_width": 0, "bottom_width": 2}
 				socket_name={"top": [], "bottom": ["burner"]}
-			elif object.shape =="light cap":
+			elif object.shape =="head":
 				socket = {"top_width": 0, "bottom_width": 2}
 				socket_name={"top": [], "bottom": ["case"]}
-			elif object.shape =="battery":
+			elif object.shape =="batteries":
 				socket = {"top_width": 0, "bottom_width": 2}
 				socket_name={"top": ["case"], "bottom": [""]}
 			elif object.shape == "case":
 				socket = {"top_width": 0, "bottom_width": 2}
-				socket_name={"top": ["light cap"], "bottom": ["battery"]}
+				socket_name={"top": ["head"], "bottom": ["batteries"]}
+			else:
+				print("OBJECT DOES NOT EXIST", object.shape)
+				assert(0)
 
 			# elif object.shape == "wheels":
 			# 	socket = {"top_width": 1, "bottom_width": 0}
