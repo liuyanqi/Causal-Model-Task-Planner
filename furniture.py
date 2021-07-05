@@ -241,34 +241,34 @@ class FurnitureState(State):
 		super().__init__()
 		# #Normal
 		self.all_object = {}
-		print("here",  plan_object)
-		if plan_object=="kerosene_lamp":
-			self.addObjectwithName("fuel tank");
-			self.addObjectwithName("burner");
-			self.addObjectwithName("chimney");
-		if plan_object == "flashlight":
-			self.addObjectwithName("head");
-			self.addObjectwithName("batteries");
-			self.addObjectwithName("case");
-		if plan_object =="candle":
-			self.addObjectwithName("wax");
-			self.addObjectwithName("wick");
-		if plan_object =="lamp":
-			self.addObjectwithName("base with cables");
-			self.addObjectwithName("light bulb");
-			self.addObjectwithName("shade");
-		else:
-			self.addObjectwithName("wax");
-			self.addObjectwithName("wick");
-			self.addObjectwithName("fuel tank");
-			self.addObjectwithName("burner");
-			self.addObjectwithName("chimney");
-			self.addObjectwithName("head");
-			self.addObjectwithName("batteries");
-			self.addObjectwithName("case");
-			self.addObjectwithName("base with cables");
-			self.addObjectwithName("light bulb");
-			self.addObjectwithName("shade");
+		# print("here",  plan_object)
+		# if plan_object=="kerosene_lamp":
+		# 	self.addObjectwithName("fuel tank");
+		# 	self.addObjectwithName("burner");
+		# 	self.addObjectwithName("chimney");
+		# if plan_object == "flashlight":
+		# 	self.addObjectwithName("head");
+		# 	self.addObjectwithName("batteries");
+		# 	self.addObjectwithName("case");
+		# if plan_object =="candle":
+		# 	self.addObjectwithName("wax");
+		# 	self.addObjectwithName("wick");
+		# if plan_object =="lamp":
+		# 	self.addObjectwithName("base with cables");
+		# 	self.addObjectwithName("light bulb");
+		# 	self.addObjectwithName("shade");
+		# else:
+		# 	self.addObjectwithName("wax");
+		# 	self.addObjectwithName("wick");
+		# 	self.addObjectwithName("fuel tank");
+		# 	self.addObjectwithName("burner");
+		# 	self.addObjectwithName("chimney");
+		# 	self.addObjectwithName("head");
+		# 	self.addObjectwithName("batteries");
+		# 	self.addObjectwithName("case");
+		# 	self.addObjectwithName("base with cables");
+		# 	self.addObjectwithName("light bulb");
+		# 	self.addObjectwithName("shade");
 
 		self.addObjectFromfile(prop_path);
 
